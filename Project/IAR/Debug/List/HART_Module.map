@@ -1,0 +1,625 @@
+###############################################################################
+#
+# IAR ELF Linker V7.50.2.10312/W32 for ARM                02/Nov/2016  19:08:32
+# Copyright 2007-2015 IAR Systems AB.
+#
+#    Output file  =  
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Exe\HART_Module.out
+#    Map file     =  
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\List\HART_Module.map
+#    Command line =  
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\ClkLib.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\DioLib.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\GptLib.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\HART.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\IntLib.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\main.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\startup_ADuCM360.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\UrtLib.o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj\WdtLib.o
+#        --redirect _Printf=_PrintfFull --redirect _Scanf=_ScanfFull -o
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Exe\HART_Module.out
+#        --map
+#        D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\List\HART_Module.map
+#        --config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        7.3\arm\config\linker\AnalogDevices\ADuCM360.icf" --semihosting
+#        --entry __iar_program_start --vfe
+#
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+CppFlavor                     = *
+__Heap_Handler                = Basic
+__SystemLibrary               = DLib
+__dlib_dynamic_initialization = normal
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"A1":  place at 0x00000000 { ro section .intvec };
+"P1":  place in [from 0x00000000 to 0x0001ffff] { ro };
+"P2":  place in [from 0x20000000 to 0x20001fff] { rw, block CSTACK, block HEAP };
+
+  Section             Kind        Address    Size  Object
+  -------             ----        -------    ----  ------
+"A1":                                        0xe0
+  .intvec             ro code  0x00000000    0xe0  startup_ADuCM360.o [1]
+                             - 0x000000e0    0xe0
+
+"P1":                                      0x5292
+  .text               ro code  0x000000e0  0x2820  HART.o [1]
+  .text               ro code  0x00002900    0x22  DioLib.o [1]
+  .text               ro code  0x00002922     0xa  xsprout.o [3]
+  .text               ro code  0x0000292c    0x2c  GptLib.o [1]
+  .text               ro code  0x00002958    0xd0  UrtLib.o [1]
+  .text               ro code  0x00002a28    0x34  sprintf.o [3]
+  .text               ro code  0x00002a5c    0x24  FltCmpGe.o [4]
+  .text               ro code  0x00002a80    0x24  FltCmpLe.o [4]
+  .text               ro code  0x00002aa4  0x1166  xprintffull.o [3]
+  .text               ro code  0x00003c0a    0x20  xmbtowc.o [3]
+  .text               ro code  0x00003c2c    0x16  strchr.o [5]
+  .text               ro code  0x00003c44    0x36  strlen.o [5]
+  .text               ro code  0x00003c7c    0x58  memchr.o [5]
+  .text               ro code  0x00003cd4     0xa  xmbcurmax.o [3]
+  .text               ro code  0x00003ce0    0xb0  xxmemxmalloc.o [3]
+  .text               ro code  0x00003d90    0x1a  xwctomb.o [3]
+  .text               ro code  0x00003dac    0x76  ABImemcpy_unaligned.o [5]
+  .text               ro code  0x00003e24    0x80  xxmemxfree.o [3]
+  .text               ro code  0x00003ea4    0xee  I64DivMod.o [5]
+  .text               ro code  0x00003f92    0x42  xdnorm.o [4]
+  .text               ro code  0x00003fd4    0x2e  DblCmpLe.o [4]
+  .text               ro code  0x00004004    0x2e  DblCmpGe.o [4]
+  .text               ro code  0x00004034   0x10c  xdscale.o [4]
+  .text               ro code  0x00004140    0x58  DblToI32.o [4]
+  .text               ro code  0x00004198    0x30  I32ToDbl.o [4]
+  .text               ro code  0x000041c8   0x180  DblSub.o [4]
+  .text               ro code  0x00004348   0x1a2  DblMul.o [4]
+  .text               ro code  0x000044ec   0x256  DblDiv.o [4]
+  .text               ro code  0x00004744    0x6c  localeconv.o [3]
+  .text               ro code  0x000047b0     0xe  div.o [3]
+  .text               ro code  0x000047c0    0x14  setlocale.o [3]
+  .text               ro code  0x000047d4    0x60  xencoding_sb.o [3]
+  .text               ro code  0x00004834    0x2c  xgetmemchunk.o [3]
+  .text               ro code  0x00004860     0x2  I64DivZer.o [5]
+  .text               ro code  0x00004864    0xd4  DblAdd.o [4]
+  .text               ro code  0x00004938     0x2  xtls.o [3]
+  .rodata             const    0x0000493c   0x780  HART.o [1]
+  .text               ro code  0x000050bc    0xa4  main.o [1]
+  .text               ro code  0x00005160    0x20  WdtLib.o [1]
+  .text               ro code  0x00005180    0x60  ClkLib.o [1]
+  .text               ro code  0x000051e0    0x40  zero_init3.o [5]
+  .text               ro code  0x00005220    0x38  packbits_init_single.o [5]
+  .text               ro code  0x00005258    0x28  data_init.o [5]
+  .iar.init_table     const    0x00005280    0x20  - Linker created -
+  .text               ro code  0x000052a0    0x1a  cmain.o [5]
+  .text               ro code  0x000052ba     0x4  low_level_init.o [3]
+  .text               ro code  0x000052be     0x4  exit.o [3]
+  .text               ro code  0x000052c4     0xa  cexit.o [5]
+  .text               ro code  0x000052d0    0x14  exit.o [6]
+  .rodata             const    0x000052e4    0x18  HART.o [1]
+  .rodata             const    0x000052fc    0x14  HART.o [1]
+  .rodata             const    0x00005310    0x10  HART.o [1]
+  .rodata             const    0x00005320     0xc  HART.o [1]
+  .rodata             const    0x0000532c     0xc  HART.o [1]
+  .rodata             const    0x00005338     0xc  HART.o [1]
+  .rodata             const    0x00005344     0xc  HART.o [1]
+  .text               ro code  0x00005350     0xc  cstartup_M.o [5]
+  .text               ro code  0x0000535c     0x4  startup_ADuCM360.o [1]
+  .rodata             const    0x00005360     0x0  zero_init3.o [5]
+  .rodata             const    0x00005360     0x0  packbits_init_single.o [5]
+  Initializer bytes   const    0x00005360    0x12  <for P2-1>
+                             - 0x00005372  0x5292
+
+"P2", part 1 of 3:                          0x105
+  P2-1                         0x20000000   0x105  <Init block>
+    .data             inited   0x20000000     0x8  HART.o [1]
+    __DLIB_PERTHREAD  inited   0x20000008    0x88  localeconv.o [3]
+    __DLIB_PERTHREAD  inited   0x20000090    0x74  setlocale.o [3]
+    .data             inited   0x20000104     0x1  HART.o [1]
+                             - 0x20000105   0x105
+
+"P2", part 2 of 3:                          0x800
+  CSTACK                       0x20000108   0x400  <Block>
+    CSTACK            uninit   0x20000108   0x400  <Block tail>
+  HEAP                         0x20000508   0x400  <Block>
+    HEAP              uninit   0x20000508   0x400  <Block tail>
+                             - 0x20000908   0x800
+
+"P2", part 3 of 3:                          0x1b4
+  .bss                zero     0x20000908    0xc0  HART.o [1]
+  .bss                zero     0x200009c8    0x6c  HART.o [1]
+  .bss                zero     0x20000a34    0x38  HART.o [1]
+  .bss                zero     0x20000a6c    0x14  HART.o [1]
+  .bss                zero     0x20000a80     0xc  HART.o [1]
+  .bss                zero     0x20000a8c     0x8  xxmemxmalloc.o [3]
+  .bss                zero     0x20000a94     0x4  HART.o [1]
+  .bss                zero     0x20000a98     0x4  HART.o [1]
+  .bss                zero     0x20000a9c     0x4  xgetmemchunk.o [3]
+  .bss                zero     0x20000aa0     0x2  HART.o [1]
+  .bss                zero     0x20000aa2     0x2  HART.o [1]
+  .bss                zero     0x20000aa4     0x2  HART.o [1]
+  .bss                zero     0x20000aa6     0x2  HART.o [1]
+  .bss                zero     0x20000aa8     0x2  HART.o [1]
+  .bss                zero     0x20000aaa     0x2  HART.o [1]
+  .bss                zero     0x20000aac     0x2  HART.o [1]
+  .bss                zero     0x20000aae     0x2  HART.o [1]
+  .bss                zero     0x20000ab0     0x2  HART.o [1]
+  .bss                zero     0x20000ab2     0x1  HART.o [1]
+  .bss                zero     0x20000ab3     0x1  HART.o [1]
+  .bss                zero     0x20000ab4     0x1  HART.o [1]
+  .bss                zero     0x20000ab5     0x1  HART.o [1]
+  .bss                zero     0x20000ab6     0x1  HART.o [1]
+  .bss                zero     0x20000ab7     0x1  HART.o [1]
+  .bss                zero     0x20000ab8     0x1  HART.o [1]
+  .bss                zero     0x20000ab9     0x1  HART.o [1]
+  .bss                zero     0x20000aba     0x1  HART.o [1]
+  .bss                zero     0x20000abb     0x1  HART.o [1]
+                             - 0x20000abc   0x1b4
+
+
+*******************************************************************************
+*** INIT TABLE
+***
+
+          Address     Size
+          -------     ----
+Zero (__iar_zero_init3)
+    1 destination range, total size 0x1b4:
+          0x20000908  0x1b4
+
+Copy/packbits (__iar_packbits_init_single3)
+    1 source range, total size 0x12 (6% of destination):
+          0x00005360   0x12
+    1 destination range, total size 0x105:
+          0x20000000  0x105
+
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                  ro code  ro data  rw data
+    ------                  -------  -------  -------
+D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj: [1]
+    ClkLib.o                     96
+    DioLib.o                     34
+    GptLib.o                     44
+    HART.o                   10 272    2 029      433
+    UrtLib.o                    208
+    WdtLib.o                     32
+    main.o                      164
+    startup_ADuCM360.o          228
+    -------------------------------------------------
+    Total:                   11 078    2 029      433
+
+command line: [2]
+    -------------------------------------------------
+    Total:
+
+dl7M_tlf.a: [3]
+    div.o                        14
+    exit.o                        4
+    localeconv.o                108        9      136
+    low_level_init.o              4
+    setlocale.o                  20        8      116
+    sprintf.o                    52
+    xencoding_sb.o               96
+    xgetmemchunk.o               44                 4
+    xmbcurmax.o                  10
+    xmbtowc.o                    32
+    xprintffull.o             4 454
+    xsprout.o                    10
+    xtls.o                        2
+    xwctomb.o                    26
+    xxmemxfree.o                128
+    xxmemxmalloc.o              176                 8
+    -------------------------------------------------
+    Total:                    5 180       17      264
+
+m7M_tl.a: [4]
+    DblAdd.o                    212
+    DblCmpGe.o                   46
+    DblCmpLe.o                   46
+    DblDiv.o                    598
+    DblMul.o                    418
+    DblSub.o                    384
+    DblToI32.o                   88
+    FltCmpGe.o                   36
+    FltCmpLe.o                   36
+    I32ToDbl.o                   48
+    xdnorm.o                     66
+    xdscale.o                   268
+    -------------------------------------------------
+    Total:                    2 246
+
+rt7M_tl.a: [5]
+    ABImemcpy_unaligned.o       118
+    I64DivMod.o                 238
+    I64DivZer.o                   2
+    cexit.o                      10
+    cmain.o                      26
+    cstartup_M.o                 12
+    data_init.o                  40
+    memchr.o                     88
+    packbits_init_single.o       56
+    strchr.o                     22
+    strlen.o                     54
+    zero_init3.o                 64
+    -------------------------------------------------
+    Total:                      730
+
+shb_l.a: [6]
+    exit.o                       20
+    -------------------------------------------------
+    Total:                       20
+
+    Gaps                         28        2
+    Linker created                        32    2 048
+-----------------------------------------------------
+    Grand Total:             19 282    2 080    2 745
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                      Address   Size  Type      Object
+-----                      -------   ----  ----      ------
+.iar.init_table$$Base   0x00005280          --   Gb  - Linker created -
+.iar.init_table$$Limit  0x000052a0          --   Gb  - Linker created -
+?main                   0x000052a1         Code  Gb  cmain.o [5]
+C0_RdUniqueId           0x00001a47   0x1c  Code  Gb  HART.o [1]
+C108_WrBurstModeCmdNum  0x000027af   0x34  Code  Gb  HART.o [1]
+C109_BurstModeControl   0x000027e3   0x30  Code  Gb  HART.o [1]
+C12_RdMessage           0x00001cc9   0x42  Code  Gb  HART.o [1]
+C13_RdTagDescriptorDate
+                        0x00001d11   0x9a  Code  Gb  HART.o [1]
+C14_RdPVTransducerInfo  0x00001dab   0x82  Code  Gb  HART.o [1]
+C15_RdDeviceInfo        0x00001e2d   0xc6  Code  Gb  HART.o [1]
+C16_RdFinalAssemblyNum  0x00001ef3   0x40  Code  Gb  HART.o [1]
+C17_WrMessage           0x00001f39   0x48  Code  Gb  HART.o [1]
+C18_WrTagDescriptorDate
+                        0x00001f81   0x5a  Code  Gb  HART.o [1]
+C19_WrFinalAssemblyNum  0x00001fe9   0x48  Code  Gb  HART.o [1]
+C1_RdPV                 0x00001a69   0x3a  Code  Gb  HART.o [1]
+C200_WrTest             0x00002813   0x60  Code  Gb  HART.o [1]
+C20_RdLongTag           0x00002031   0x42  Code  Gb  HART.o [1]
+C22_WrLongTag           0x00002079   0x42  Code  Gb  HART.o [1]
+C2_RdLoopCurrPerOfRange
+                        0x00001aa3   0x32  Code  Gb  HART.o [1]
+C33_RdDeviceVariable    0x000020c1  0x1fc  Code  Gb  HART.o [1]
+C34_WrPVDamping         0x000022bd   0x34  Code  Gb  HART.o [1]
+C35_WrPVRange           0x000022f5   0x66  Code  Gb  HART.o [1]
+C36_SetPVUpperRange     0x0000235b   0x1e  Code  Gb  HART.o [1]
+C37_SetPVLowerRange     0x00002379   0x1e  Code  Gb  HART.o [1]
+C38_ResetCfgChangeFlag  0x00002397   0x32  Code  Gb  HART.o [1]
+C3_RdDVLoopCurr         0x00001add   0xb8  Code  Gb  HART.o [1]
+C40_EnterOrExitFixedCurrent
+                        0x000023cd   0x36  Code  Gb  HART.o [1]
+C41_PerformSelfTest     0x00002403    0x8  Code  Gb  HART.o [1]
+C42_PerformDeviceReset  0x0000240b    0x8  Code  Gb  HART.o [1]
+C43_PVZero              0x00002413   0x1a  Code  Gb  HART.o [1]
+C44_WrPVUnit            0x00002431   0x3a  Code  Gb  HART.o [1]
+C45_TrimLoopCurrentZero
+                        0x0000246b   0x5c  Code  Gb  HART.o [1]
+C46_TrimLoopCurrentGain
+                        0x000024c7   0x5c  Code  Gb  HART.o [1]
+C47_WrPVTransferFunction
+                        0x00002523   0x3a  Code  Gb  HART.o [1]
+C48_RdAdditionalDeviceStatus
+                        0x00002575   0xc8  Code  Gb  HART.o [1]
+C49_WrPVTransducerSerialNum
+                        0x00002641   0x56  Code  Gb  HART.o [1]
+C50_RdDVAssignments     0x000026a1   0x5c  Code  Gb  HART.o [1]
+C51_WrDVAssignments     0x000026fd   0x7e  Code  Gb  HART.o [1]
+C59_WrNumOfResposePreambles
+                        0x0000277b   0x34  Code  Gb  HART.o [1]
+C6_WrPollingAddr        0x00001b99   0x58  Code  Gb  HART.o [1]
+C7_RdLoopConfiguration  0x00001bf1   0x42  Code  Gb  HART.o [1]
+C8_RdDVClass            0x00001c41   0x76  Code  Gb  HART.o [1]
+C9_RdStatusDV           0x00001cc1    0x8  Code  Gb  HART.o [1]
+CSTACK$$Base            0x20000108          --   Gb  - Linker created -
+CSTACK$$Limit           0x20000508          --   Gb  - Linker created -
+Chip_Initailize         0x000050bd   0x7e  Code  Gb  main.o [1]
+ClkCfg                  0x00005181   0x20  Code  Gb  ClkLib.o [1]
+ClkDis                  0x000051cd    0x8  Code  Gb  ClkLib.o [1]
+ClkSel                  0x000051a1   0x2c  Code  Gb  ClkLib.o [1]
+Cmd_Function            0x00000a6d  0x394  Code  Gb  HART.o [1]
+Config_Change           0x0000186d   0x1a  Code  Lc  HART.o [1]
+Data_To_Float           0x000018a1   0x20  Code  Lc  HART.o [1]
+DioCfg                  0x00002901    0x6  Code  Gb  DioLib.o [1]
+DioClr                  0x00002919    0xa  Code  Gb  DioLib.o [1]
+DioOen                  0x00002907    0x6  Code  Gb  DioLib.o [1]
+DioPul                  0x0000290d    0x6  Code  Gb  DioLib.o [1]
+DioSet                  0x00002913    0x6  Code  Gb  DioLib.o [1]
+Enter_Critical_Section  0x00000a65    0x4  Code  Gb  HART.o [1]
+Exit_Critical_Section   0x00000a69    0x4  Code  Gb  HART.o [1]
+Float_To_Data           0x000018c1   0x62  Code  Lc  HART.o [1]
+Frame_Cmd_Data          0x00000e01   0x60  Code  Gb  HART.o [1]
+GLCD_ClearScreen        0x000002f3   0x30  Code  Gb  HART.o [1]
+GLCD_GoTo               0x000002b9   0x3a  Code  Gb  HART.o [1]
+GLCD_Initialize         0x00000251   0x68  Code  Gb  HART.o [1]
+GLCD_InitializePorts    0x0000011b   0x58  Code  Gb  HART.o [1]
+GLCD_WriteChar5x7       0x00000323   0x36  Code  Gb  HART.o [1]
+GLCD_WriteCommand       0x000001dd   0x74  Code  Gb  HART.o [1]
+GLCD_WriteData          0x00000173   0x6a  Code  Gb  HART.o [1]
+GLCD_WriteString5x7     0x00000359   0x16  Code  Gb  HART.o [1]
+GP_Tmr0_Int_Handler     0x000028a7   0x30  Code  Gb  HART.o [1]
+Get_Act_Gain_Current    0x0000076f    0x8  Code  Gb  HART.o [1]
+Get_Act_Zero_Current    0x00000767    0x8  Code  Gb  HART.o [1]
+Get_Alarm_Sw            0x000006eb    0xa  Code  Gb  HART.o [1]
+Get_Analog_Channel      0x00000727    0xa  Code  Gb  HART.o [1]
+Get_Analog_Channel_Fixed
+                        0x00000569    0xa  Code  Gb  HART.o [1]
+Get_Analog_Channel_Saturation
+                        0x00000555    0xa  Code  Gb  HART.o [1]
+Get_Burst_Mode          0x00000479    0xa  Code  Gb  HART.o [1]
+Get_Burst_Mode_Cmd_Num  0x0000048d    0xa  Code  Gb  HART.o [1]
+Get_Date                0x00000617    0x6  Code  Gb  HART.o [1]
+Get_Descriptor          0x000005f1    0x6  Code  Gb  HART.o [1]
+Get_Device_Operating_Mode
+                        0x000007a5    0xa  Code  Gb  HART.o [1]
+Get_Device_Specific_Status
+                        0x00000795    0x6  Code  Gb  HART.o [1]
+Get_Extended_Device_Status
+                        0x000004f1    0xa  Code  Gb  HART.o [1]
+Get_Final_Assembly_Num  0x00000751    0x6  Code  Gb  HART.o [1]
+Get_Fixed_Current       0x0000075f    0x8  Code  Gb  HART.o [1]
+Get_Host_Type           0x000007af    0xc  Code  Gb  HART.o [1]
+Get_LongTag             0x0000063d    0x6  Code  Gb  HART.o [1]
+Get_Loop_Current        0x00000457    0x8  Code  Gb  HART.o [1]
+Get_Loop_Current_Mode   0x000004dd    0xa  Code  Gb  HART.o [1]
+Get_Message             0x000005a5    0x6  Code  Gb  HART.o [1]
+Get_Percent_Of_Range    0x00000467    0x8  Code  Gb  HART.o [1]
+Get_Polling_Addr        0x000004c9    0xa  Code  Gb  HART.o [1]
+Get_Protect             0x00000713    0xa  Code  Gb  HART.o [1]
+Get_Pv                  0x00000377    0x8  Code  Gb  HART.o [1]
+Get_Pv_Code             0x00000409    0xa  Code  Gb  HART.o [1]
+Get_Pv_Damping_Time     0x000006c3    0xa  Code  Gb  HART.o [1]
+Get_Pv_Lower_Range      0x000006af    0xa  Code  Gb  HART.o [1]
+Get_Pv_Min_Span         0x000006d7    0xa  Code  Gb  HART.o [1]
+Get_Pv_Unit             0x000003b9    0xa  Code  Gb  HART.o [1]
+Get_Pv_Upper_Range      0x0000069b    0xa  Code  Gb  HART.o [1]
+Get_Qv                  0x000003a7    0x8  Code  Gb  HART.o [1]
+Get_Qv_Code             0x00000445    0xa  Code  Gb  HART.o [1]
+Get_Qv_Unit             0x000003f5    0xa  Code  Gb  HART.o [1]
+Get_Response_Preamble_Num
+                        0x000004a1    0xa  Code  Gb  HART.o [1]
+Get_Rx_Data_Pointer     0x00001923   0x14  Code  Gb  HART.o [1]
+Get_Std_Status_0        0x00000505    0xa  Code  Gb  HART.o [1]
+Get_Std_Status_1        0x00000519    0xa  Code  Gb  HART.o [1]
+Get_Std_Status_2        0x0000052d    0xa  Code  Gb  HART.o [1]
+Get_Std_Status_3        0x00000541    0xa  Code  Gb  HART.o [1]
+Get_Sv                  0x00000387    0x8  Code  Gb  HART.o [1]
+Get_Sv_Code             0x0000041d    0xa  Code  Gb  HART.o [1]
+Get_Sv_Unit             0x000003cd    0xa  Code  Gb  HART.o [1]
+Get_Tag                 0x000005cb    0x6  Code  Gb  HART.o [1]
+Get_Transducer_Lower    0x00000687    0xa  Code  Gb  HART.o [1]
+Get_Transducer_Serial_Num
+                        0x00000663    0x6  Code  Gb  HART.o [1]
+Get_Transducer_Upper    0x00000673    0xa  Code  Gb  HART.o [1]
+Get_Transfer_Func       0x000006ff    0xa  Code  Gb  HART.o [1]
+Get_Tv                  0x00000397    0x8  Code  Gb  HART.o [1]
+Get_Tv_Code             0x00000431    0xa  Code  Gb  HART.o [1]
+Get_Tv_Unit             0x000003e1    0xa  Code  Gb  HART.o [1]
+Get_Ul_Range_Unit       0x000004b5    0xa  Code  Gb  HART.o [1]
+GptCfg                  0x0000292d   0x20  Code  Gb  GptLib.o [1]
+GptClrInt               0x00002953    0x6  Code  Gb  GptLib.o [1]
+GptLd                   0x0000294d    0x6  Code  Gb  GptLib.o [1]
+HART_Init               0x000007ff   0x4a  Code  Gb  HART.o [1]
+HART_Process            0x000009af   0xaa  Code  Lc  HART.o [1]
+HART_Rx_Msg             0x00001169  0x386  Code  Gb  HART.o [1]
+HART_Tx_Msg             0x0000107d   0xa4  Code  Gb  HART.o [1]
+HART_Wait               0x000008ed   0xc2  Code  Lc  HART.o [1]
+HART_polling            0x00000849   0x94  Code  Gb  HART.o [1]
+HEAP$$Base              0x20000508          --   Gb  - Linker created -
+HEAP$$Limit             0x20000908          --   Gb  - Linker created -
+HrtByteCnt              0x20000aa6    0x2  Data  Gb  HART.o [1]
+HrtDeviceStatus         0x20000aba    0x1  Data  Gb  HART.o [1]
+HrtResposeCode          0x20000ab9    0x1  Data  Gb  HART.o [1]
+Init_Param              0x00000eb5  0x148  Code  Gb  HART.o [1]
+Is_Addr_Match           0x00000e61   0x2c  Code  Lc  HART.o [1]
+Is_Timeout_Id           0x000015b1   0x26  Code  Gb  HART.o [1]
+LCD                     0x20000a6c   0x14  Data  Gb  HART.o [1]
+LoadInt                 0x000030f3   0x6e  Code  Lc  xprintffull.o [3]
+Longitudinal_Parity     0x00000e91   0x24  Code  Lc  HART.o [1]
+NVIC_EnableIRQ          0x000000e1   0x16  Code  Lc  HART.o [1]
+RcvFrameCnt             0x20000aa4    0x2  Data  Gb  HART.o [1]
+Region$$Table$$Base     0x00005280          --   Gb  - Linker created -
+Region$$Table$$Limit    0x000052a0          --   Gb  - Linker created -
+Send_Byte               0x000014ef   0x10  Code  Gb  HART.o [1]
+Set_Alarm_Sw            0x000006e1    0xa  Code  Gb  HART.o [1]
+Set_Analog_Channel      0x0000071d    0xa  Code  Gb  HART.o [1]
+Set_Analog_Channel_Fixed
+                        0x0000055f    0xa  Code  Gb  HART.o [1]
+Set_Analog_Channel_Saturation
+                        0x0000054b    0xa  Code  Gb  HART.o [1]
+Set_Burst_Mode          0x0000046f    0xa  Code  Gb  HART.o [1]
+Set_Burst_Mode_Cmd_Num  0x00000483    0xa  Code  Gb  HART.o [1]
+Set_Config_Change_Flag  0x00000573    0xa  Code  Gb  HART.o [1]
+Set_Data_Link           0x00001945   0xc0  Code  Gb  HART.o [1]
+Set_Date                0x000005f7   0x20  Code  Gb  HART.o [1]
+Set_Delay_Time          0x0000156f   0x36  Code  Gb  HART.o [1]
+Set_Descriptor          0x000005d1   0x20  Code  Gb  HART.o [1]
+Set_Device_Operating_Mode
+                        0x0000079b    0xa  Code  Gb  HART.o [1]
+Set_Device_Specific_Status
+                        0x00000777   0x1e  Code  Gb  HART.o [1]
+Set_Extended_Device_Status
+                        0x000004e7    0xa  Code  Gb  HART.o [1]
+Set_Final_Assembly_Num  0x00000731   0x20  Code  Gb  HART.o [1]
+Set_Fixed_Current       0x00000757    0x8  Code  Gb  HART.o [1]
+Set_LongTag             0x0000061d   0x20  Code  Gb  HART.o [1]
+Set_Loop_Current        0x0000044f    0x8  Code  Gb  HART.o [1]
+Set_Loop_Current_Mode   0x000004d3    0xa  Code  Gb  HART.o [1]
+Set_Message             0x00000585   0x20  Code  Gb  HART.o [1]
+Set_Percent_Of_Range    0x0000045f    0x8  Code  Gb  HART.o [1]
+Set_Polling_Addr        0x000004bf    0xa  Code  Gb  HART.o [1]
+Set_Protect             0x00000709    0xa  Code  Gb  HART.o [1]
+Set_Pv                  0x0000036f    0x8  Code  Gb  HART.o [1]
+Set_Pv_Code             0x000003ff    0xa  Code  Gb  HART.o [1]
+Set_Pv_Damping_Time     0x000006b9    0xa  Code  Gb  HART.o [1]
+Set_Pv_Lower_Range      0x000006a5    0xa  Code  Gb  HART.o [1]
+Set_Pv_Min_Span         0x000006cd    0xa  Code  Gb  HART.o [1]
+Set_Pv_Unit             0x000003af    0xa  Code  Gb  HART.o [1]
+Set_Pv_Upper_Range      0x00000691    0xa  Code  Gb  HART.o [1]
+Set_Pv_Zero             0x0000057d    0x8  Code  Gb  HART.o [1]
+Set_Qv                  0x0000039f    0x8  Code  Gb  HART.o [1]
+Set_Qv_Code             0x0000043b    0xa  Code  Gb  HART.o [1]
+Set_Qv_Unit             0x000003eb    0xa  Code  Gb  HART.o [1]
+Set_Rcv_Frame_Count     0x00001509   0x1a  Code  Gb  HART.o [1]
+Set_Response_Code       0x00001a05   0x42  Code  Gb  HART.o [1]
+Set_Response_Preamble_Num
+                        0x00000497    0xa  Code  Gb  HART.o [1]
+Set_Std_Status_0        0x000004fb    0xa  Code  Gb  HART.o [1]
+Set_Std_Status_1        0x0000050f    0xa  Code  Gb  HART.o [1]
+Set_Std_Status_2        0x00000523    0xa  Code  Gb  HART.o [1]
+Set_Std_Status_3        0x00000537    0xa  Code  Gb  HART.o [1]
+Set_Sv                  0x0000037f    0x8  Code  Gb  HART.o [1]
+Set_Sv_Code             0x00000413    0xa  Code  Gb  HART.o [1]
+Set_Sv_Unit             0x000003c3    0xa  Code  Gb  HART.o [1]
+Set_Tag                 0x000005ab   0x20  Code  Gb  HART.o [1]
+Set_Transducer_Lower    0x0000067d    0xa  Code  Gb  HART.o [1]
+Set_Transducer_Serial_Num
+                        0x00000643   0x20  Code  Gb  HART.o [1]
+Set_Transducer_Upper    0x00000669    0xa  Code  Gb  HART.o [1]
+Set_Transfer_Func       0x000006f5    0xa  Code  Gb  HART.o [1]
+Set_Tv                  0x0000038f    0x8  Code  Gb  HART.o [1]
+Set_Tv_Code             0x00000427    0xa  Code  Gb  HART.o [1]
+Set_Tv_Unit             0x000003d7    0xa  Code  Gb  HART.o [1]
+Set_Ul_Range_Unit       0x000004ab    0xa  Code  Gb  HART.o [1]
+Soft_Timer_Dec          0x00001551   0x1e  Code  Lc  HART.o [1]
+Soft_Timer_Init         0x000007bb   0x28  Code  Gb  HART.o [1]
+TIMER0_Init             0x000007e3   0x1c  Code  Gb  HART.o [1]
+UART_Enable             0x00001027   0x56  Code  Gb  HART.o [1]
+UART_Init               0x00000ffd   0x2a  Code  Gb  HART.o [1]
+UART_Int_Handler        0x00002873   0x34  Code  Gb  HART.o [1]
+UrtCfg                  0x00002959   0x9a  Code  Gb  UrtLib.o [1]
+UrtIntCfg               0x00002a1f    0x6  Code  Gb  UrtLib.o [1]
+UrtIntSta               0x00002a25    0x4  Code  Gb  UrtLib.o [1]
+UrtMod                  0x00002a15    0xa  Code  Gb  UrtLib.o [1]
+UrtRx                   0x00002a11    0x4  Code  Gb  UrtLib.o [1]
+UrtTx                   0x00002a01   0x10  Code  Gb  UrtLib.o [1]
+WdtCfg                  0x00005161   0x1c  Code  Gb  WdtLib.o [1]
+_EncodingSb_Mbtowc      0x000047ef   0x30  Code  Gb  xencoding_sb.o [3]
+_EncodingSb_Wctomb      0x000047d5   0x1a  Code  Gb  xencoding_sb.o [3]
+_GenldFull              0x00003977  0x24c  Code  Lc  xprintffull.o [3]
+_IsdstStr               0x20000094    0x4  Data  Gb  setlocale.o [3]
+_LdtobFull              0x00003575  0x3fc  Code  Lc  xprintffull.o [3]
+_LitobFull              0x0000346d  0x106  Code  Lc  xprintffull.o [3]
+_LocaleEncoding         0x000047c1    0xe  Code  Gb  setlocale.o [3]
+_LocaleReturnString     0x200000b4   0x50  Data  Lc  setlocale.o [3]
+_Locale_Profile         0x20000098   0x1c  Data  Gb  setlocale.o [3]
+_Locale_aeabi_lconv     0x20000058   0x38  Data  Gb  localeconv.o [3]
+_Locale_lconv           0x20000008   0x50  Data  Gb  localeconv.o [3]
+_Mbtowc                 0x00003c0b   0x20  Code  Gb  xmbtowc.o [3]
+_PrintfFull             0x00002aa5  0x638  Code  Gb  xprintffull.o [3]
+_PutcharsFull           0x00003bc3   0x2e  Code  Lc  xprintffull.o [3]
+_PutstrFull             0x00003161  0x306  Code  Lc  xprintffull.o [3]
+_SProut                 0x00002923    0xa  Code  Gb  xsprout.o [3]
+_TzoneStr               0x20000090    0x4  Data  Gb  setlocale.o [3]
+_Wctomb                 0x00003d91   0x1a  Code  Gb  xwctomb.o [3]
+__aeabi_cdcmple         0x00003fd5         Code  Gb  DblCmpLe.o [4]
+__aeabi_cdrcmple        0x00004005         Code  Gb  DblCmpGe.o [4]
+__aeabi_cfcmple         0x00002a81         Code  Gb  FltCmpLe.o [4]
+__aeabi_cfrcmple        0x00002a5d         Code  Gb  FltCmpGe.o [4]
+__aeabi_d2iz            0x00004141         Code  Gb  DblToI32.o [4]
+__aeabi_d2uiz           0x0000416d         Code  Gb  DblToI32.o [4]
+__aeabi_ddiv            0x000044ed         Code  Gb  DblDiv.o [4]
+__aeabi_dmul            0x00004349         Code  Gb  DblMul.o [4]
+__aeabi_dsub            0x000041c9         Code  Gb  DblSub.o [4]
+__aeabi_i2d             0x00004199         Code  Gb  I32ToDbl.o [4]
+__aeabi_ldiv0           0x00004861         Code  Gb  I64DivZer.o [5]
+__aeabi_ui2d            0x000041ad         Code  Gb  I32ToDbl.o [4]
+__aeabi_uldivmod        0x00003ea5         Code  Gb  I64DivMod.o [5]
+__cmain                 0x000052a1         Code  Gb  cmain.o [5]
+__data_Aldata           0x20000a8c    0x8  Data  Gb  xxmemxmalloc.o [3]
+__data_GetMemChunk      0x00004835   0x2c  Code  Gb  xgetmemchunk.o [3]
+__exit                  0x000052d1   0x14  Code  Gb  exit.o [6]
+__iar_Dnorm             0x00003f93   0x42  Code  Gb  xdnorm.o [4]
+__iar_Dscale            0x00004035  0x10c  Code  Gb  xdscale.o [4]
+__iar_Locale_lconv_init
+                        0x00004745   0x3a  Code  Gb  localeconv.o [3]
+__iar_Mbcurmax          0x00003cd5    0xa  Code  Gb  xmbcurmax.o [3]
+__iar_Memchr            0x00003c7d         Code  Gb  memchr.o [5]
+__iar_Strchr            0x00003c2d         Code  Gb  strchr.o [5]
+__iar_d2uiz             0x00004179         Code  Gb  DblToI32.o [4]
+__iar_dadd              0x00004865         Code  Gb  DblAdd.o [4]
+__iar_data_init3        0x00005259   0x28  Code  Gb  data_init.o [5]
+__iar_dlib_perthread_access
+                        0x00004939    0x2  Code  Gb  xtls.o [3]
+__iar_dsub              0x000041dd         Code  Gb  DblSub.o [4]
+__iar_dsubStart         0x000041ef         Code  Gb  DblSub.o [4]
+__iar_packbits_init_single3
+                        0x00005221   0x38  Code  Gb  packbits_init_single.o [5]
+__iar_program_start     0x00005351         Code  Gb  cstartup_M.o [5]
+__iar_ui2d              0x000041b1         Code  Gb  I32ToDbl.o [4]
+__iar_unaligned___aeabi_memcpy
+                        0x00003dad         Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_unaligned___aeabi_memcpy4
+                        0x00003dcd         Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_unaligned___aeabi_memcpy8
+                        0x00003dcd         Code  Gb  ABImemcpy_unaligned.o [5]
+__iar_zero_init3        0x000051e1   0x40  Code  Gb  zero_init3.o [5]
+__low_level_init        0x000052bb    0x4  Code  Gb  low_level_init.o [3]
+__vector_table          0x00000000         Data  Gb  startup_ADuCM360.o [1]
+_call_main              0x000052ad         Code  Gb  cmain.o [5]
+_exit                   0x000052c5         Code  Gb  cexit.o [5]
+_main                   0x000052b7         Code  Gb  cmain.o [5]
+_para                   0x20000908   0xc0  Data  Gb  HART.o [1]
+command                 0x20000a94    0x4  Data  Gb  HART.o [1]
+configurationChangeCounter
+                        0x20000aa8    0x2  Data  Gb  HART.o [1]
+delay_ms                0x00000107   0x14  Code  Gb  HART.o [1]
+delay_us                0x000000f7   0x10  Code  Gb  HART.o [1]
+div                     0x000047b1    0xe  Code  Gb  div.o [3]
+dly_cnt                 0x20000aaa    0x2  Data  Gb  HART.o [1]
+exit                    0x000052bf    0x4  Code  Gb  exit.o [3]
+font5x7                 0x0000493c  0x780  Data  Lc  HART.o [1]
+free                    0x00003e25   0x7a  Code  Gb  xxmemxfree.o [3]
+g_Burst                 0x20000ab8    0x1  Data  Gb  HART.o [1]
+g_HartState             0x20000ab4    0x1  Data  Gb  HART.o [1]
+g_Host                  0x20000104    0x1  Data  Gb  HART.o [1]
+g_RcvMsgType            0x20000ab2    0x1  Data  Gb  HART.o [1]
+g_RcvState              0x20000ab5    0x1  Data  Gb  HART.o [1]
+g_Rx                    0x20000a34   0x38  Data  Gb  HART.o [1]
+g_Tx                    0x200009c8   0x6c  Data  Gb  HART.o [1]
+g_XmtMsgType            0x20000ab3    0x1  Data  Gb  HART.o [1]
+g_XmtState              0x20000ab6    0x1  Data  Gb  HART.o [1]
+g_tmr                   0x20000a80    0xc  Data  Gb  HART.o [1]
+glcd_x                  0x20000aac    0x2  Data  Gb  HART.o [1]
+glcd_y                  0x20000aae    0x2  Data  Gb  HART.o [1]
+localeconv              0x0000477f   0x16  Code  Gb  localeconv.o [3]
+long_addr               0x20000000    0x8  Data  Gb  HART.o [1]
+main                    0x00005149   0x18  Code  Gb  main.o [1]
+malloc                  0x00003ce1   0xac  Code  Gb  xxmemxmalloc.o [3]
+memchr                  0x00003c7d         Code  Gb  memchr.o [5]
+pXmtBufferCur           0x20000a98    0x4  Data  Lc  HART.o [1]
+s_RcvBufferPos          0x20000aa2    0x2  Data  Lc  HART.o [1]
+s_XmtBufferCnt          0x20000aa0    0x2  Data  Lc  HART.o [1]
+s_XmtPreambleNum        0x20000ab7    0x1  Data  Lc  HART.o [1]
+set_ID                  0x00001649  0x21e  Code  Gb  HART.o [1]
+sprintf                 0x00002a29   0x34  Code  Gb  sprintf.o [3]
+strchr                  0x00003c2d         Code  Gb  strchr.o [5]
+strlen                  0x00003c45         Code  Gb  strlen.o [5]
+
+
+[1] = D:\001_Works\001_Working\20161021_HART_Module\Project\IAR\Debug\Obj
+[2] = command line
+[3] = dl7M_tlf.a
+[4] = m7M_tl.a
+[5] = rt7M_tl.a
+[6] = shb_l.a
+
+  19 282 bytes of readonly  code memory
+   2 080 bytes of readonly  data memory
+   2 745 bytes of readwrite data memory
+
+Errors: none
+Warnings: none

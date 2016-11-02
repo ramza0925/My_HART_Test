@@ -1,0 +1,8 @@
+---- DEBUG Matches (7 in 2 files) ----
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG        
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
+HART.h (d:\001_works\001_working\20161021_hart_module\inc):#define DEBUG

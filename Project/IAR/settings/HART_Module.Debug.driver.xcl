@@ -1,0 +1,19 @@
+"--endian=little" 
+
+"--cpu=Cortex-M3" 
+
+"--fpu=None" 
+
+"-p" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\arm\CONFIG\debugger\AnalogDevices\ADuCM360.ddf" 
+
+"--semihosting" 
+
+"--device=ADuCM360" 
+
+"--multicore_nr_of_cores=1" 
+
+
+
+
