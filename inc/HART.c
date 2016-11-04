@@ -30,14 +30,14 @@ struct parameter{
 	float SV;
 	float TV;
 	float QV;
-	float LoopCurrent; //unit : mA
-	float PercnetOfRange; // unit : %
-	float FixedCurrent;   // if = 0 , current value = actual current; else current value = fixed current; unit : mA
+	float LoopCurrent; 										//unit : mA
+	float PercnetOfRange; 									// unit : %
+	float FixedCurrent;   									// if = 0 , current value = actual current; else current value = fixed current; unit : mA
 	float PVZero;
-	float ExtMeasuredZeroCurr; //externally measured zero currrent
-	float ActMeasuredZeroCurr; //actual measured zero current
-	float ExtMeasuredGainCurr; //externallu measured gain current
-	float ActMeasuredGainCurr; //actual measured gain current
+	float ExtMeasuredZeroCurr; 								//externally measured zero currrent
+	float ActMeasuredZeroCurr; 								//actual measured zero current
+	float ExtMeasuredGainCurr; 								//externallu measured gain current
+	float ActMeasuredGainCurr; 								//actual measured gain current
 	u8 PVUnit;
 	u8 SVUnit;
 	u8 TVUnit;
@@ -52,7 +52,7 @@ struct parameter{
 	u8 ResposePreambleNum;
 	u8 BurstModeCmdNum;
 	u8 BurstModeCode;
-	u8 ConfigChangeFlag; //configuration change flag
+	u8 ConfigChangeFlag; 									//configuration change flag
 	u8 ExtendedDeviceStatus;
 	u8 DeviceOperatingMode;
 	u8 Standardized_status_0;
@@ -61,14 +61,14 @@ struct parameter{
 	u8 Standardized_status_2;
 	u8 Standardized_status_3;
 	u8 AnalogChannelFixed;
-	u8 Msg[24];  //packed
-	u8 Tag[6];   //packed
-	u8 LongTag[32]; //Latin-1
-	u8 Dscp[12];  //descriptor , packed
-	u8 Date[3];  //date : day/month/year
-	u8 Tsn[3];  //transducer serial number
-	u8 Dss[6];  //device specific status
-	float TransducerUpper;  //PV transducer unit code is the same as PV_UNIT
+	u8 Msg[24];  											//packed
+	u8 Tag[6];   											//packed
+	u8 LongTag[32]; 										//Latin-1
+	u8 Dscp[12];  											//descriptor , packed
+	u8 Date[3];  											//date : day/month/year
+	u8 Tsn[3];  											//transducer serial number
+	u8 Dss[6];  											//device specific status
+	float TransducerUpper;  								//PV transducer unit code is the same as PV_UNIT
 	float TransducerLower;
 	float PVMinSpan;
 	float PVUpperRange;
@@ -87,11 +87,8 @@ static volatile u8 s_XmtPreambleNum;						//Received Preamble Count
 static volatile u16 s_RcvBufferPos;
 
 volatile u16 RcvFrameCnt = 0; 		// receive frame count
-//volatile u8 FramePrcCompFlg = 0; 	// frame process completed flag
-//volatile u8 TsmFrameCompFlg = 0; 	// transmit frame completed flag
 
 u8 g_Burst = FALSE;
-//u8 g_Bt = 0;
 u8 g_Host = PRIMARY_MASTER;
 
 Long_Addr_Type long_addr = {DEVICE_TYPE0,DEVICE_TYPE1,UNIQUE_DEVICE_ID0,UNIQUE_DEVICE_ID1,UNIQUE_DEVICE_ID2};
@@ -99,7 +96,6 @@ Long_Addr_Type long_addr = {DEVICE_TYPE0,DEVICE_TYPE1,UNIQUE_DEVICE_ID0,UNIQUE_D
 u16 HrtByteCnt = 0;
 u8 HrtResposeCode = 0;
 u8 HrtDeviceStatus = 0;
-//u8 HrtResposePos = 0;
 
 u16 configurationChangeCounter = 0;											//Configuration Change Counter(Must save/load in H/W Memory)
 u8 fieldDeviceStatus = 0;													//Field Device Status(Must saved/load in H/W Memory)
@@ -134,11 +130,11 @@ float Get_Qv(void)     { return _para.QV; }
 /* DV unit */
 void Set_Pv_Unit(u8 pv_unit) { _para.PVUnit = pv_unit; }
 u8 Get_Pv_Unit(void) { return _para.PVUnit; }
-void Set_Sv_Unit(unsigned char sv_unit) { _para.SVUnit = sv_unit; }
+void Set_Sv_Unit(u8 sv_unit) { _para.SVUnit = sv_unit; }
 u8 Get_Sv_Unit(void) { return _para.SVUnit; }
-void Set_Tv_Unit(unsigned char tv_unit) { _para.TVUnit = tv_unit; }
+void Set_Tv_Unit(u8 tv_unit) { _para.TVUnit = tv_unit; }
 u8 Get_Tv_Unit(void) { return _para.TVUnit; }
-void Set_Qv_Unit(unsigned char qv_unit) { _para.QVUnit = qv_unit; }
+void Set_Qv_Unit(u8 qv_unit) { _para.QVUnit = qv_unit; }
 u8 Get_Qv_Unit(void) { return _para.QVUnit; }
 /* DV code */
 void Set_Pv_Code(u8 pv_code) { _para.PVCode = pv_code; }
@@ -295,10 +291,8 @@ void Soft_Timer_Init(void){
 
 void TIMER0_Init(void){
 	//--------- Timer 0 Setup 1 msec -------------
-   GptLd(pADI_TM0, 32);	//2Mhz PCLK
-   //GptLd(pADI_TM0, 0x3E8);	//16Mhz PCLK
+   GptLd(pADI_TM0, 32);	//32khz PCLK
    GptCfg(pADI_TM0,TCON_CLK_LFOSC,TCON_PRE_DIV1,TCON_MOD_PERIODIC|TCON_RLD_DIS|TCON_ENABLE_EN|TCON_UP_DIS);
-   
 }
 
 //HART Initialize
@@ -339,6 +333,7 @@ void HART_polling(void){
 			s_XmtBufferCnt = g_Tx.address_size + 3 + g_Tx.byte_count +1;
 			pXmtBufferCur = g_Tx.data_buf;
 			DioClr(pADI_GP0, BIT5);
+			delay_ms(5);
 			UART_Enable(FALSE,TRUE);
 #ifdef DEBUG
 		GLCD_GoTo(10, 1);
@@ -350,13 +345,8 @@ void HART_polling(void){
 
 //It Received Hart Msg in Wait Mode
 static void HART_Wait(void){
-	Rcv_Msg_Type rcv_msg_t;
-	u8 BurstMode;
-
-	rcv_msg_t = g_RcvMsgType;
-	BurstMode = Get_Burst_Mode();
 	//Burst Mode
-	if(BurstMode){
+	if(Get_Burst_Mode()){
 		g_Burst = TRUE;
 		Set_Delay_Time(BT_TIMER,0);
 		g_Host = PRIMARY_MASTER;
@@ -373,16 +363,16 @@ static void HART_Wait(void){
 	}
 	//No Burst Mode
 	else{
-		switch(rcv_msg_t){
+		switch(g_RcvMsgType){
 			case RCV_ERR:							//Receive Msg Error
 				break;				
 			case RCV_ACK:							//Receive Msg ACK
-				Set_Delay_Time(BT_TIMER,0);
+				//Set_Delay_Time(BT_TIMER,0);
 				Set_Delay_Time(SLAVE_TIMER, HART_STO);
 				break;				
 			case RCV_STX:							//Reccive Msg STX
 				if(Is_Addr_Match()){				//Address Check
-					Set_Delay_Time(BT_TIMER,0);
+					//Set_Delay_Time(BT_TIMER,0);
 					Set_Delay_Time(SLAVE_TIMER, HART_STO);
 					g_HartState = HART_PROCESS;		//HART Process Start
 				}
@@ -399,9 +389,8 @@ static void HART_Wait(void){
 
 //HART Command Response Function
 static void HART_Process(void){
-	u8 cnt, is_burst_mode;
+	u8 cnt;
 	
-	is_burst_mode = Get_Burst_Mode();
 	cnt = g_Rx.address_size + 3 + g_Rx.data_buf[g_Rx.address_size+2];
 	if(Is_Timeout_Id(SLAVE_TIMER)){		//slave TimeOut
 		g_HartState = HART_WAIT;
@@ -417,12 +406,7 @@ static void HART_Process(void){
 	Frame_Cmd_Data();		
 	cnt = g_Tx.address_size + 3 + g_Tx.byte_count;
 	g_Tx.data_buf[cnt] = Longitudinal_Parity(g_Tx.data_buf, cnt);
-	if(is_burst_mode){
-		g_HartState = HART_WAIT;
-	}
-	else{
-		g_HartState = HART_WAIT;
-	}
+	g_HartState = HART_WAIT;
 
 }
 
@@ -435,18 +419,12 @@ void Exit_Critical_Section(void){
 }
 
 u16 Cmd_Function(u8 cmd, u8 *data){
-	u8 burst_cmd, is_burst_mode;
-	
-	is_burst_mode = Get_Burst_Mode();
 	HrtByteCnt = 0;
-	
-	if(is_burst_mode){
-		burst_cmd = Get_Burst_Mode_Cmd_Num();
-		
+	if(Get_Burst_Mode()){
 		if(cmd == 109){ //burst mode control : enter or exit burst mode.
 			command = C109_BurstModeControl;
 		}
-		switch(burst_cmd){
+		switch(Get_Burst_Mode_Cmd_Num()){
 			case 1:	
 				*(data-2) = 1;
 				command = C1_RdPV;	  
@@ -518,6 +496,7 @@ u16 Cmd_Function(u8 cmd, u8 *data){
 	return HrtByteCnt;
 }
 
+//Make Command Data Frame
 void Frame_Cmd_Data(void){
 	u8 cmd;
 	u8 *data;
@@ -539,7 +518,6 @@ void Frame_Cmd_Data(void){
 		g_Tx.data_buf[HART_SHORTF_LEN_OFF] = g_Tx.byte_count;
 	}
 }
-
 
 //TODO Must be Adrress Matching between Master Request and Slave address
 static u8 Is_Addr_Match(void){
@@ -681,8 +659,8 @@ void HART_Tx_Msg(void){
 					}
 				}
 				if(g_XmtState == XMT_DONE){
-					DioSet(pADI_GP0, BIT5);
 					UART_Enable(TRUE,FALSE);
+					DioSet(pADI_GP0, BIT5);
 					g_XmtState = XMT_INIT;
 #ifdef DEBUG
 				GLCD_GoTo(10, 2);
@@ -871,7 +849,6 @@ void HART_Rx_Msg(void){
 	}
 }
 
-//TODO need to upgrade
 void Send_Byte(const u8 ch){
     UrtTx(pADI_UART, ch);
 }
@@ -1025,10 +1002,10 @@ void set_ID(u8 *data){
 	data[HrtByteCnt++] = UNIQUE_DEVICE_ID1;
 	data[HrtByteCnt++] = UNIQUE_DEVICE_ID2;
 	data[HrtByteCnt++] = Get_Response_Preamble_Num();				//12: Minimum Preamble Number
-	data[HrtByteCnt++] = 4;											//13: Device Variable Maximum Number
+	data[HrtByteCnt++] = 6;											//13: Device Variable Maximum Number
 	data[HrtByteCnt++] = ((configurationChangeCounter&0xFF00)>>8);	//14-15: Configuration Changed Counter
 	data[HrtByteCnt++] = (configurationChangeCounter&0xFF);
-	data[HrtByteCnt++] = 0x02;							//16: Expanded Field Device Status 
+	data[HrtByteCnt++] = 0x02;										//16: Expanded Field Device Status 
 	data[HrtByteCnt++] = ((MANUFACTURER_ID&0xFF00)>>8);				//17-18: Manufacturer ID
 	data[HrtByteCnt++] = (MANUFACTURER_ID&0xFF);
 	data[HrtByteCnt++] = ((DISTRIBUTER_ID&0xFF00)>>8);				//19-20: DISTRIBUTER_ID
@@ -1177,8 +1154,7 @@ void C6_WrPollingAddr(u8 *data){
 	u8 *dat;
 	
 	Set_Response_Code(data);
-	if(!HrtResposeCode)
-	{
+	if(!HrtResposeCode){
 		dat = Get_Rx_Data_Pointer();
 		data[HrtByteCnt++] = *dat;
 		data[HrtByteCnt++] = *(dat+1);
@@ -1803,8 +1779,7 @@ void UART_Int_Handler(void){
    	}
 }
 
-void GP_Tmr0_Int_Handler(void)
-{
+void GP_Tmr0_Int_Handler(void){
 	u8 i;
 	
    // Timer0 Interrupt : 1msec

@@ -25,7 +25,7 @@ typedef uint32_t		u32;
 #define FALSE			0
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 #define PREAMBLE             0xFF
 #define PREAMBLE_DEFAULT_NUM 5
@@ -37,11 +37,17 @@ typedef uint32_t		u32;
 #define SLAVE_TIMER 1
 #define BT_TIMER    2
 
-#define HART_STO       257 /* unit:ms, sto = 256.7ms */
+//#define HART_STO       257 /* unit:ms, sto = 256.7ms */
+//#define HART_PRI_RT1   305 /* unit:ms,  = 302.5ms */
+//#define HART_SEC_RT1   376 /* unit:ms,  = 375.8ms */
+//#define HART_RT2       74  /* unit:ms,  = 73.3ms */
+//#define HART_GAPT      10  /* unit:ms,  = 9.2ms */
+
+#define HART_STO       260 /* unit:ms, sto = 256.7ms */
 #define HART_PRI_RT1   305 /* unit:ms,  = 302.5ms */
-#define HART_SEC_RT1   376 /* unit:ms,  = 375.8ms */
-#define HART_RT2       74  /* unit:ms,  = 73.3ms */
-#define HART_GAPT      10  /* unit:ms,  = 9.2ms */
+#define HART_SEC_RT1   380 /* unit:ms,  = 375.8ms */
+#define HART_RT2       75  /* unit:ms,  = 73.3ms */
+#define HART_GAPT      18  /* unit:ms,  = 9.2ms */
 
 #define LONG_ADDR_SIZE  5
 #define SHORT_ADDR_SIZE 1
@@ -228,11 +234,11 @@ void  Set_Qv(float qv);
 float Get_Qv(void);
 void Set_Pv_Unit(u8 pv_unit);
 u8 Get_Pv_Unit(void);
-void Set_Sv_Unit(unsigned char sv_unit);
+void Set_Sv_Unit(u8 sv_unit);
 u8 Get_Sv_Unit(void);
-void Set_Tv_Unit(unsigned char tv_unit);
+void Set_Tv_Unit(u8 tv_unit);
 u8 Get_Tv_Unit(void);
-void Set_Qv_Unit(unsigned char qv_unit);
+void Set_Qv_Unit(u8 qv_unit);
 u8 Get_Qv_Unit(void);
 void Set_Pv_Code(u8 pv_code);
 u8 Get_Pv_Code(void);
@@ -324,16 +330,19 @@ u8 Get_Host_Type(void);
 void Init_Param(void);
 void Soft_Timer_Init(void);
 void TIMER0_Init(void);
+void UART_Init(void);
+
 void HART_Init(void);
 void HART_polling(void);
-static void HART_Wait(void);
-static void HART_Process(void);
+void HART_Wait(void);
+void HART_Process(void);
+
 u16 Cmd_Function(u8 cmd, u8 *data);
 void Frame_Cmd_Data(void);
-static u8 Is_Addr_Match(void);
-static u8 Longitudinal_Parity(u8 *data, u16 cnt);
+u8 Is_Addr_Match(void);
+u8 Longitudinal_Parity(u8 *data, u16 cnt);
 
-void UART_Init();
+
 void UART_Enable(u8 rx_enable, u8 tx_enable);
 void HART_Tx_Msg(void);
 void HART_Rx_Msg(void);
@@ -349,14 +358,14 @@ u8 Packed_ASCII(const u8* Src, u16 SrcLen, u8* Dst, u16 DstLen);
 u8 Unpcked_ASCII(const u8* Src,u16 SrcLen,u8 *Dst,u16 DstLen);
 
 
-static void Soft_Timer_Dec(Soft_Timer *tmr);
+void Soft_Timer_Dec(Soft_Timer *tmr);
 void Set_Delay_Time(u8 id,u16 cnt);
 u8 Is_Timeout_Id(u8 id);
 
 void set_ID(u8 *data);
-static void Config_Change(void);
-static float Data_To_Float(u8 *tmp);
-static void Float_To_Data(u8 *data,float *tmp);
+void Config_Change(void);
+float Data_To_Float(u8 *tmp);
+void Float_To_Data(u8 *data,float *tmp);
 u8 *Get_Rx_Data_Pointer(void);
 void Set_Data_Link(void);
 void Set_Response_Code(u8 *data);
