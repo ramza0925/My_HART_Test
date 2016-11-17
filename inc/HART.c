@@ -1,7 +1,9 @@
 #include "HART.h"
 
-#define MANUFACTURER_ID   		0x60DE
-#define DISTRIBUTER_ID          0x60DE						//SAMHOI
+#define MANUFACTURER_ID1   		0x60						//SAMHOI
+#define MANUFACTURER_ID2   		0xDE
+#define DISTRIBUTER_ID1         0x60						//SAMHOI
+#define DISTRIBUTER_ID2         0xDE						
 #define DEVICE_TYPE0    		0xE3
 #define DEVICE_TYPE1    		0x7D
 #define UNIQUE_DEVICE_ID0 		0x70						//HART Revision
@@ -34,9 +36,9 @@ struct parameter{
 	float PercnetOfRange; // unit : %
 	float FixedCurrent;   // if = 0 , current value = actual current; else current value = fixed current; unit : mA
 	float PVZero;
-	float ExtMeasuredZeroCurr; //externally measured zero currrent
+	//float ExtMeasuredZeroCurr; //externally measured zero currrent
 	float ActMeasuredZeroCurr; //actual measured zero current
-	float ExtMeasuredGainCurr; //externallu measured gain current
+	//float ExtMeasuredGainCurr; //externallu measured gain current
 	float ActMeasuredGainCurr; //actual measured gain current
 	u8 PVUnit;
 	u8 SVUnit;
@@ -46,6 +48,7 @@ struct parameter{
 	u8 SVCode;
 	u8 TVCode;
 	u8 QVCode;
+	u8 PVStatus;
 	u8 ULRangeUnit;
 	u8 PollingAddr;
 	u8 LoopCurrentMode;
@@ -53,6 +56,7 @@ struct parameter{
 	u8 BurstModeCmdNum;
 	u8 BurstModeCode;
 	u8 ConfigChangeFlag; //configuration change flag
+	u16 ConfigurationChangeCounter;
 	u8 ExtendedDeviceStatus;
 	u8 DeviceOperatingMode;
 	u8 Standardized_status_0;
@@ -79,6 +83,30 @@ struct parameter{
 	enum protect ProtectStatus;
 	enum analog_channel AnalogChlFlg;
 	u8 Fan[3]; //final assembly number
+	float CORR_Value;
+	u8 CORR_Unit;
+	u8 CORR_Code;
+	u8 CORR_Status;
+	float UserSet_20mA_Value;
+	u8 UserSet_20mA_Unit;
+	u8 UserSet_20mA_Code;
+	u8 UserSet_20mA_Status;
+	float UserSet_4mA_Value;
+	u8 UserSet_4mA_Unit;
+	u8 UserSet_4mA_Code;
+	u8 UserSet_4mA_Status;
+	float CurrentDir_Value;
+	u8 CurrentDir_Unit;
+	u8 CurrentDir_Code;
+	u8 CurrentDir_Status;
+	float Density_Value;
+	u8 Density_Unit;
+	u8 Density_Code;
+	u8 Density_Status;
+	float Contrast_Value;
+	u8 Contrast_Unit;
+	u8 Contrast_Code;
+	u8 Contrast_Status;
 }_para;
 
 static volatile u8 *pXmtBufferCur;
@@ -99,14 +127,13 @@ Long_Addr_Type long_addr = {DEVICE_TYPE0,DEVICE_TYPE1,UNIQUE_DEVICE_ID0,UNIQUE_D
 u16 HrtByteCnt = 0;
 u8 HrtResposeCode = 0;
 u8 HrtDeviceStatus = 0;
-//u8 HrtResposePos = 0;
 
-u16 configurationChangeCounter = 0;											//Configuration Change Counter(Must save/load in H/W Memory)
-u8 fieldDeviceStatus = 0;													//Field Device Status(Must saved/load in H/W Memory)
-
+u8 dummyData[] = {0x7f, 0xa0, 0x00, 0x00};
+#ifdef DEBUG
 u16 dly_cnt = 0;
 u16 glcd_x, glcd_y;
 char LCD[20];
+
 
 void delay_us (u32 length){ 
   length /= 3;
@@ -121,6 +148,7 @@ void delay_ms (u32 length){
 
 #include "..\inc\G_LCD\SPLC501C.c"
 #include "..\inc\G_LCD\graphic.c"
+#endif
 
 /* DVs */
 void  Set_Pv(float pv) {_para.PV = pv;}
@@ -149,6 +177,8 @@ void Set_Tv_Code(u8 tv_code) { _para.TVCode = tv_code; }
 u8 Get_Tv_Code(void) { return _para.TVCode; }
 void Set_Qv_Code(u8 qv_code) { _para.QVCode = qv_code; }
 u8 Get_Qv_Code(void) { return _para.QVCode; }
+void Set_Pv_Status(u8 pv_status) { _para.PVStatus = pv_status; }
+u8 Get_Pv_Status(void) { return _para.PVStatus; }
 /* loop current and percent of range */
 void  Set_Loop_Current(float current) { _para.LoopCurrent = current; }
 float Get_Loop_Current(void) { return _para.LoopCurrent; }
@@ -189,6 +219,8 @@ void Set_Analog_Channel_Fixed(u8 Acf){_para.AnalogChannelFixed = Acf;}
 u8 Get_Analog_Channel_Fixed(void){return _para.AnalogChannelFixed;}
 void Set_Config_Change_Flag(u8 cfg_change_flag) { _para.ConfigChangeFlag = cfg_change_flag; }
 u8 Get_Config_Change_Flag(void) { return _para.ConfigChangeFlag; }
+void Set_Config_Change_Counter(u16 cfg_change_counter) { _para.ConfigurationChangeCounter = cfg_change_counter; }
+u16 Get_Config_Change_Counter(void) { return _para.ConfigurationChangeCounter; }
 void Set_Pv_Zero(float pv_zero) { _para.PVZero = pv_zero; }
 float Get_Pv_Zero(void) { return _para.PVZero; }
 void Set_Message(u8 *msg){
@@ -283,7 +315,54 @@ u8 *Get_Device_Specific_Status(void) { return _para.Dss; }
 void Set_Device_Operating_Mode(u8 mode) { _para.DeviceOperatingMode = mode; }
 u8 Get_Device_Operating_Mode(void) { return _para.DeviceOperatingMode; }
 u8 Get_Host_Type(void){return (g_Rx.data_buf[1] & 0x80);}
-
+void Set_CORR_Value(float correct_value) {_para.CORR_Value = correct_value; }
+float Get_CORR_Value(void) {return _para.CORR_Value; }
+void Set_CORR_Unit(u8 correct_unit) {_para.CORR_Unit = correct_unit; }
+u8 Get_CORR_Unit(void) {return _para.CORR_Unit; }
+void Set_CORR_Code(u8 correct_code) {_para.CORR_Code = correct_code; }
+u8 Get_CORR_Code(void) {return _para.CORR_Code; }
+void Set_CORR_Status(u8 correct_status) {_para.CORR_Status = correct_status; }
+u8 Get_CORR_Status(void) {return _para.CORR_Status; }
+void Set_UserSet_20mA_Value(float userset_20ma_value) {_para.UserSet_20mA_Value = userset_20ma_value; }
+float Get_UserSet_20mA_Value(void) {return _para.UserSet_20mA_Value; }
+void Set_UserSet_20mA_Unit(u8 userset_20ma_unit) {_para.UserSet_20mA_Unit = userset_20ma_unit; }
+u8 Get_UserSet_20mA_Unit(void) {return _para.UserSet_20mA_Unit; }
+void Set_UserSet_20mA_Code(u8 userset_20ma_code) {_para.UserSet_20mA_Code = userset_20ma_code; }
+u8 Get_UserSet_20mA_Code(void) {return _para.UserSet_20mA_Code; }
+void Set_UserSet_20mA_Status(u8 userset_20ma_status) {_para.UserSet_20mA_Status = userset_20ma_status; }
+u8 Get_UserSet_20mA_Status(void) {return _para.UserSet_20mA_Status; }
+void Set_UserSet_4mA_Value(float userset_4ma_value) {_para.UserSet_4mA_Value = userset_4ma_value; }
+float Get_UserSet_4mA_Value(void) {return _para.UserSet_4mA_Value; }
+void Set_UserSet_4mA_Unit(u8 userset_4ma_unit) {_para.UserSet_4mA_Unit = userset_4ma_unit; }
+u8 Get_UserSet_4mA_Unit(void) {return _para.UserSet_4mA_Unit; }
+void Set_UserSet_4mA_Code(u8 userset_4ma_code) {_para.UserSet_4mA_Code = userset_4ma_code; }
+u8 Get_UserSet_4mA_Code(void) {return _para.UserSet_4mA_Code; }
+void Set_UserSet_4mA_Status(u8 userset_4ma_status) {_para.UserSet_4mA_Status = userset_4ma_status; }
+u8 Get_UserSet_4mA_Status(void) {return _para.UserSet_4mA_Status; }
+void Set_CurrentDir_Value(float currentdir_value) {_para.CurrentDir_Value = currentdir_value; }
+float Get_CurrentDir_Value(void) {return _para.CurrentDir_Value; }
+void Set_CurrentDir_Unit(u8 currentdir_unit) {_para.CurrentDir_Unit = currentdir_unit; }
+u8 Get_CurrentDir_Unit(void) {return _para.CurrentDir_Unit; }
+void Set_CurrentDir_Code(u8 currentdir_code) {_para.CurrentDir_Code = currentdir_code; }
+u8 Get_CurrentDir_Code(void) {return _para.CurrentDir_Code; }
+void Set_CurrentDir_Status(u8 currentdir_status) {_para.CurrentDir_Status = currentdir_status; }
+u8 Get_CurrentDir_Status(void) {return _para.CurrentDir_Status; }
+void Set_Density_Value(float density_value) {_para.Density_Value = density_value; }
+float Get_Density_Value(void) {return _para.Density_Value; }
+void Set_Density_Unit(u8 density_unit) {_para.Density_Unit = density_unit; }
+u8 Get_Density_Unit(void) {return _para.Density_Unit; }
+void Set_Density_Code(u8 density_code) {_para.Density_Code = density_code; }
+u8 Get_Density_Code(void) {return _para.Density_Code; }
+void Set_Density_Status(u8 density_status) {_para.Density_Status = density_status; }
+u8 Get_Density_Status(void) {return _para.Density_Status; }
+void Set_Contrast_Value(float contrast_value) {_para.Contrast_Value = contrast_value; }
+float Get_Contrast_Value(void) {return _para.Contrast_Value; }
+void Set_Contrast_Unit(u8 contrast_unit) {_para.Contrast_Unit = contrast_unit; }
+u8 Get_Contrast_Unit(void) {return _para.Contrast_Unit; }
+void Set_Contrast_Code(u8 contrast_code) {_para.Contrast_Code = contrast_code; }
+u8 Get_Contrast_Code(void) {return _para.Contrast_Code; }
+void Set_Contrast_Status(u8 contrast_status) {_para.Contrast_Status = contrast_status; }
+u8 Get_Contrast_Status(void) {return _para.Contrast_Status; }
 
 void Soft_Timer_Init(void){
 	u8 i;
@@ -303,6 +382,8 @@ void TIMER0_Init(void){
 
 //HART Initialize
 void HART_Init(void){
+	u8 buf[] = "HARTTEST";
+	u8 dst[6];
 	TIMER0_Init();
 	UART_Init();												//UART Initialize
 
@@ -311,6 +392,10 @@ void HART_Init(void){
 	
 	GLCD_Initialize();
 	GLCD_ClearScreen();
+
+	
+	Packed_ASCII(buf,sizeof(buf),dst,6);
+	Set_Tag(dst);
 	
 	UART_Enable(TRUE, FALSE);									//Rx Enable, Tx DIsable
 	Set_Burst_Mode(FALSE);										//No Burst Mode
@@ -339,6 +424,9 @@ void HART_polling(void){
 			s_XmtBufferCnt = g_Tx.address_size + 3 + g_Tx.byte_count +1;
 			pXmtBufferCur = g_Tx.data_buf;
 			DioClr(pADI_GP0, BIT5);
+			for (int k = 0; k < 500; k++) {
+            	for (int kk = 0; kk < 10; kk++) asm ("nop");
+			}
 			UART_Enable(FALSE,TRUE);
 #ifdef DEBUG
 		GLCD_GoTo(10, 1);
@@ -541,7 +629,6 @@ void Frame_Cmd_Data(void){
 }
 
 
-//TODO Must be Adrress Matching between Master Request and Slave address
 static u8 Is_Addr_Match(void){
 	u8 polling_addr;
 	
@@ -555,16 +642,16 @@ static u8 Is_Addr_Match(void){
 		}
 	}
 	else{
-//		if( (long_addr.device_type[0] == (g_Rx.data_buf[HART_LONGF_ADDR_OFF]&0x3F)) && \
-//			(long_addr.device_type[1] == g_Rx.data_buf[HART_LONGF_ADDR_OFF+1]) && \
-//			(long_addr.unique_device_id[0] == g_Rx.data_buf[HART_LONGF_ADDR_OFF+2]) && \
-//			(long_addr.unique_device_id[1] == g_Rx.data_buf[HART_LONGF_ADDR_OFF+3]) && \
-//			(long_addr.unique_device_id[2] == g_Rx.data_buf[HART_LONGF_ADDR_OFF+4]) ){
+		if(((long_addr.device_type[0]&0x3F) == (g_Rx.data_buf[HART_LONGF_ADDR_OFF]&0x3F)) && \
+			((long_addr.device_type[1]) == (g_Rx.data_buf[HART_LONGF_ADDR_OFF+1])) && \
+			((long_addr.unique_device_id[0]) == (g_Rx.data_buf[HART_LONGF_ADDR_OFF+2])) && \
+			((long_addr.unique_device_id[1]) == (g_Rx.data_buf[HART_LONGF_ADDR_OFF+3])) && \
+			((long_addr.unique_device_id[2]) == (g_Rx.data_buf[HART_LONGF_ADDR_OFF+4]))){
 			return TRUE;
-//		}
-//		else{
-//			return FALSE;
-//		}
+		}
+		else{
+			return FALSE;
+		}
 	}
 }
 
@@ -580,20 +667,26 @@ static u8 Longitudinal_Parity(u8 *data, u16 cnt){
 
 //Initialize _parm
 //TODO Init Value Change
-void Init_Param(void){
+void Init_Param(void){	
+	u8 buf[] = "HARTTEST";
+	u8 dst[6];
+	Packed_ASCII(buf,sizeof(buf),dst,6);
+
+	u8 _datae[] = {12,11,116};
+	
 	Set_Pv(0.0f);
 	Set_Sv(0.0f);
 	Set_Tv(0.0f);
 	Set_Qv(0.0f);
 	Set_Loop_Current(4.0f);
 	Set_Percent_Of_Range(0.0f);
-	Set_Fixed_Current(4.0f);
+	Set_Fixed_Current(0.0f);
 	Set_Pv_Zero(0.0f);
-	_para.ExtMeasuredZeroCurr = 0.0f;
-	_para.ActMeasuredZeroCurr = 0.0f;
-	_para.ExtMeasuredGainCurr = 0.0f;
-	_para.ActMeasuredGainCurr = 0.0f;
-	Set_Pv_Unit(0);
+	//_para.ExtMeasuredZeroCurr = 0.0f;
+	Set_Act_Zero_Current(0.0f);
+	//_para.ExtMeasuredGainCurr = 0.0f;
+	Set_Act_Gain_Current(0.0f);
+	Set_Pv_Unit(DEGREES_MILLIMETER);
 	Set_Sv_Unit(0);
 	Set_Tv_Unit(0);
 	Set_Qv_Unit(0);
@@ -601,13 +694,15 @@ void Init_Param(void){
 	Set_Sv_Code(0);
 	Set_Tv_Code(0);
 	Set_Qv_Code(0);
-	Set_Ul_Range_Unit(0);
+	Set_Pv_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_Ul_Range_Unit(DEGREES_MILLIMETER);
 	Set_Polling_Addr(0);
-	Set_Loop_Current_Mode(0);
+	Set_Loop_Current_Mode(ENABLE);
 	Set_Response_Preamble_Num(PREAMBLE_DEFAULT_NUM);
 	Set_Burst_Mode_Cmd_Num(0);
 	Set_Burst_Mode(0);
 	Set_Config_Change_Flag(0);
+	Set_Config_Change_Counter(0);
 	Set_Extended_Device_Status(1);
 	Set_Device_Operating_Mode(0);
 	Set_Std_Status_0(0);
@@ -617,22 +712,46 @@ void Init_Param(void){
 	Set_Analog_Channel_Saturation(0);
 	Set_Analog_Channel_Fixed(0);
 	Set_Message(0);
-	Set_Tag(0);
+	Set_Tag(dst);
 	Set_LongTag(0);
-	Set_Date(0);
+	Set_Date(_datae);
 	Set_Transducer_Serial_Num(0);
 	Set_Device_Specific_Status(0);
-	Set_Transducer_Upper(0.0f);
-	Set_Transducer_Lower(0.0f);
+	Set_Transducer_Upper(600.0f);
+	Set_Transducer_Lower(-100.0f);
 	Set_Pv_Min_Span(0.0f);
-	Set_Pv_Upper_Range(0.0f);
-	Set_Pv_Lower_Range(0.0f);
-	Set_Pv_Damping_Time(0.0f);
+	Set_Pv_Upper_Range(480.0f);
+	Set_Pv_Lower_Range(30.0f);
+	Set_Pv_Damping_Time(1.0f);
 	Set_Alarm_Sw(NONE_ALARM);
 	Set_Transfer_Func(LINEAR);
 	Set_Protect(NO_PROTECT);
 	Set_Analog_Channel(CHANNEL_FLAG);
 	Set_Final_Assembly_Num(0);
+	Set_CORR_Value(300.0f);
+	Set_CORR_Unit(DEGREES_MILLIMETER);
+	Set_CORR_Code(DFC_NOT_USED);
+	Set_CORR_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_UserSet_20mA_Value(400.0f);
+	Set_UserSet_20mA_Unit(DEGREES_MILLIMETER);
+	Set_UserSet_20mA_Code(DFC_NOT_USED);
+	Set_UserSet_20mA_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_UserSet_4mA_Value(30.0f);
+	Set_UserSet_4mA_Unit(DEGREES_MILLIMETER);
+	Set_UserSet_4mA_Code(DFC_NOT_USED);
+	Set_UserSet_4mA_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_CurrentDir_Value(0);
+	Set_CurrentDir_Unit(DEGREES_NONE);
+	Set_CurrentDir_Code(DFC_NOT_USED);
+	Set_CurrentDir_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_Density_Value(1.0f);
+	Set_Density_Unit(DEGREES_NONE);
+	Set_Density_Code(DFC_NOT_USED);
+	Set_Density_Status(PDQ_GOOD|LS_NOT_LIMITED);
+	Set_Contrast_Value(1.0f);
+	Set_Contrast_Unit(DEGREES_NONE);
+	Set_Contrast_Code(DFC_NOT_USED);
+	Set_Contrast_Status(PDQ_GOOD|LS_NOT_LIMITED);
 }
 
 //UART Initialize
@@ -681,6 +800,9 @@ void HART_Tx_Msg(void){
 					}
 				}
 				if(g_XmtState == XMT_DONE){
+					for (int k = 0; k < 500; k++) {
+            			for (int kk = 0; kk < 10; kk++) asm ("nop");
+					}
 					DioSet(pADI_GP0, BIT5);
 					UART_Enable(TRUE,FALSE);
 					g_XmtState = XMT_INIT;
@@ -871,7 +993,6 @@ void HART_Rx_Msg(void){
 	}
 }
 
-//TODO need to upgrade
 void Send_Byte(const u8 ch){
     UrtTx(pADI_UART, ch);
 }
@@ -1010,35 +1131,34 @@ u8 Is_Timeout_Id(u8 id){
 	return FALSE;
 }
 
-//TODO Data Check
-void set_ID(u8 *data){
-	data[HrtByteCnt++] = 254;										//0: 254
-	data[HrtByteCnt++] = DEVICE_TYPE0;								//1-2: Expanded Device Cype
+void Set_ID(u8 *data){
+	data[HrtByteCnt++] = 254;												//0: 254
+	data[HrtByteCnt++] = DEVICE_TYPE0;										//1-2: Expanded Device Cype
 	data[HrtByteCnt++] = DEVICE_TYPE1;
-	data[HrtByteCnt++] = Get_Response_Preamble_Num();				//3: Preamble Number
-	data[HrtByteCnt++] = HART_REVISION; 							//4: HART Revision
-	data[HrtByteCnt++] = DEVICE_REVISION; 							//5: Device Revision
-	data[HrtByteCnt++] = SOFT_REVISION;  							//6: Software Revision
-	data[HrtByteCnt++] = ((HARD_REVISION)<<3)|BELL_202_CURRENT;		//7(0-2): Physical Signaling Codes(0- Bell 202 Current), (3-7): Hardware Revision, 
-	data[HrtByteCnt++] = 0x14; 										//8: FlagAssignment
-	data[HrtByteCnt++] = UNIQUE_DEVICE_ID0;							//9-11: Unique Device ID
+	data[HrtByteCnt++] = Get_Response_Preamble_Num();						//3: Preamble Number
+	data[HrtByteCnt++] = HART_REVISION; 									//4: HART Revision
+	data[HrtByteCnt++] = DEVICE_REVISION; 									//5: Device Revision
+	data[HrtByteCnt++] = SOFT_REVISION;  									//6: Software Revision
+	data[HrtByteCnt++] = ((HARD_REVISION)<<3)|BELL_202_CURRENT;				//7(0-2): Physical Signaling Codes(0- Bell 202 Current), (3-7): Hardware Revision, 
+	data[HrtByteCnt++] = UNDEFINED_FLAG_ASSINMENT; 							//8: FlagAssignment(0 :Undefined)
+	data[HrtByteCnt++] = UNIQUE_DEVICE_ID0;									//9-11: Unique Device ID
 	data[HrtByteCnt++] = UNIQUE_DEVICE_ID1;
 	data[HrtByteCnt++] = UNIQUE_DEVICE_ID2;
-	data[HrtByteCnt++] = Get_Response_Preamble_Num();				//12: Minimum Preamble Number
-	data[HrtByteCnt++] = 4;											//13: Device Variable Maximum Number
-	data[HrtByteCnt++] = ((configurationChangeCounter&0xFF00)>>8);	//14-15: Configuration Changed Counter
-	data[HrtByteCnt++] = (configurationChangeCounter&0xFF);
-	data[HrtByteCnt++] = 0x02;							//16: Expanded Field Device Status 
-	data[HrtByteCnt++] = ((MANUFACTURER_ID&0xFF00)>>8);				//17-18: Manufacturer ID
-	data[HrtByteCnt++] = (MANUFACTURER_ID&0xFF);
-	data[HrtByteCnt++] = ((DISTRIBUTER_ID&0xFF00)>>8);				//19-20: DISTRIBUTER_ID
-	data[HrtByteCnt++] = (DISTRIBUTER_ID&0xFF);
-	data[HrtByteCnt++] = 0x01;										//21: Device Profile(1-Process Automation Device)
+	data[HrtByteCnt++] = Get_Response_Preamble_Num();						//12: Minimum Preamble Number
+	data[HrtByteCnt++] = 7;													//13: Device Variable Maximum Number
+	data[HrtByteCnt++] = (u8)((Get_Config_Change_Counter()&0xFF00)>>8);	//14-15: Configuration Changed Counter
+	data[HrtByteCnt++] = (u8)(Get_Config_Change_Counter()&0xFF);
+	data[HrtByteCnt++] = UNDEFINED_EXPANDED_DEVICE_STATUS;					//16: Expanded Field Device Status 
+	data[HrtByteCnt++] = MANUFACTURER_ID1;									//17-18: Manufacturer ID
+	data[HrtByteCnt++] = MANUFACTURER_ID2;
+	data[HrtByteCnt++] = DISTRIBUTER_ID1;									//19-20: DISTRIBUTER_ID
+	data[HrtByteCnt++] = DISTRIBUTER_ID2;
+	data[HrtByteCnt++] = PROCESS_AUTOMATION_DEVICE;							//21: Device Profile(1-Process Automation Device)
 }
 
-static void Config_Change(void){
+static void Config_Change(u16 CmdCode){
 	HrtDeviceStatus |= 0x40;
-	Set_Config_Change_Flag(0xC0);
+	Set_Config_Change_Flag(CmdCode);
 }
 
 
@@ -1119,10 +1239,11 @@ void Set_Response_Code(u8 *data){
 }
 
 /* the same as C11 */
+//CMD0 - Read Unique ID
 void C0_RdUniqueId(u8 *data) {
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
-		set_ID(data);
+		Set_ID(data);
 	}
 }
 
@@ -1137,6 +1258,7 @@ void C1_RdPV(u8 *data){
 	}
 }
 
+//CMD2 - Read LoopCurretn And Percentage of Range
 void C2_RdLoopCurrPerOfRange(u8 *data){
 	float tmp1,tmp2;
 	
@@ -1149,27 +1271,26 @@ void C2_RdLoopCurrPerOfRange(u8 *data){
 	}
 }
 
-
-//TODO  Do SV,TV,QV need to this system?
+//CMD3 - Read DV And LoopCurrent
 void C3_RdDVLoopCurr(u8 *data){
-	float tmp1,tmp2,tmp3,tmp4,tmp5;
+	float tmp1,tmp2;
 	
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
 		tmp1 = Get_Loop_Current();
 		tmp2 = Get_Pv();
-		tmp3 = Get_Sv();
-		tmp4 = Get_Tv();
-		tmp5 = Get_Qv();
+		//tmp3 = Get_Sv();
+		//tmp4 = Get_Tv();
+		//tmp5 = Get_Qv();
 		Float_To_Data(data,&tmp1);
 		data[HrtByteCnt++] = Get_Pv_Unit();
 		Float_To_Data(data,&tmp2);
-		data[HrtByteCnt++] = Get_Sv_Unit();
-		Float_To_Data(data,&tmp3);
-		data[HrtByteCnt++] = Get_Tv_Unit();
-		Float_To_Data(data,&tmp4);
-		data[HrtByteCnt++] = Get_Qv_Unit();	
-		Float_To_Data(data,&tmp5);
+		//data[HrtByteCnt++] = Get_Sv_Unit();
+		//Float_To_Data(data,&tmp3);
+		//data[HrtByteCnt++] = Get_Tv_Unit();
+		//Float_To_Data(data,&tmp4);
+		//data[HrtByteCnt++] = Get_Qv_Unit();	
+		//Float_To_Data(data,&tmp5);
 	}
 }
 
@@ -1184,9 +1305,11 @@ void C6_WrPollingAddr(u8 *data){
 		data[HrtByteCnt++] = *(dat+1);
 		Set_Polling_Addr(*dat);
 		Set_Loop_Current_Mode(*(dat+1));
+		Config_Change(6);
 	}
 }
 
+//CMD7 - Read LoopCurrent mode and polling Address
 void C7_RdLoopConfiguration(u8 *data){
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
@@ -1195,71 +1318,85 @@ void C7_RdLoopConfiguration(u8 *data){
 	}
 }
 
-//TODO Data Check(Table 21)
+//CMD8 - Read DV Classfication
 void C8_RdDVClass(u8 *data){
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
-		data[HrtByteCnt++] = PV_CLASS;
-		data[HrtByteCnt++] = SV_CLASS;
-		data[HrtByteCnt++] = TV_CLASS;
-		data[HrtByteCnt++] = QV_CLASS;
+		data[HrtByteCnt++] = TORQUE;
+		data[HrtByteCnt++] = 250;		//Not Used
+		data[HrtByteCnt++] = 250;		//Not Used
+		data[HrtByteCnt++] = 250;		//Not Used
 	}
 }
 
 //TODO Data Check
 void C9_RdStatusDV(u8 *data){
+	float tmp1;
+
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
-/*		data[HrtByteCnt++] = fieldDeviceStatus;
-		data[HrtByteCnt++] = DVCode0;
-		data[HrtByteCnt++] = DVClass0;
-		data[HrtByteCnt++] = DVUnit0;
-		Float_To_Data(data,&DVValue0);
-		data[HrtByteCnt++] = DVStatus0;
+		data[HrtByteCnt++] = Get_Extended_Device_Status();
+		data[HrtByteCnt++] = Get_Pv_Code();
+		data[HrtByteCnt++] = TORQUE;
+		data[HrtByteCnt++] = Get_Pv_Unit();
+		tmp1 = Get_Pv();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_Pv_Status();
 		
-		data[HrtByteCnt++] = DVCode1;
-		data[HrtByteCnt++] = DVClass1;
-		data[HrtByteCnt++] = DVUnit1;
-		Float_To_Data(data,&DVValue1);
-		data[HrtByteCnt++] = DVStatus1;
+		data[HrtByteCnt++] = Get_CORR_Code();
+		data[HrtByteCnt++] = TORQUE;
+		data[HrtByteCnt++] = Get_CORR_Unit();
+		tmp1 = Get_CORR_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_CORR_Status();
 
-		data[HrtByteCnt++] = DVCode2;
-		data[HrtByteCnt++] = DVClass2;
-		data[HrtByteCnt++] = DVUnit2;
-		Float_To_Data(data,&DVValue2);
-		data[HrtByteCnt++] = DVStatus2;
+		data[HrtByteCnt++] = Get_UserSet_20mA_Code();
+		data[HrtByteCnt++] = TORQUE;
+		data[HrtByteCnt++] = Get_UserSet_20mA_Unit();
+		tmp1 = Get_UserSet_20mA_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_UserSet_20mA_Status();
 
-		data[HrtByteCnt++] = DVCode3;
-		data[HrtByteCnt++] = DVClass3;
-		data[HrtByteCnt++] = DVUnit3;
-		Float_To_Data(data,&DVValue3);
-		data[HrtByteCnt++] = DVStatus3;
+		data[HrtByteCnt++] = Get_UserSet_4mA_Code();
+		data[HrtByteCnt++] = TORQUE;
+		data[HrtByteCnt++] = Get_UserSet_4mA_Unit();
+		tmp1 = Get_UserSet_4mA_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_UserSet_4mA_Status();
 
-		data[HrtByteCnt++] = DVCode4;
-		data[HrtByteCnt++] = DVClass4;
-		data[HrtByteCnt++] = DVUnit4;
-		Float_To_Data(data,&DVValue4);
-		data[HrtByteCnt++] = DVStatus4;
+		data[HrtByteCnt++] = Get_CurrentDir_Code();
+		data[HrtByteCnt++] = DEVICE_VARIABLE_NOT_CLASSIFICATION;
+		data[HrtByteCnt++] = Get_CurrentDir_Unit();
+		tmp1 = Get_CurrentDir_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_CurrentDir_Status();
 
-		data[HrtByteCnt++] = DVCode5;
-		data[HrtByteCnt++] = DVClass5;
-		data[HrtByteCnt++] = DVUnit5;
-		Float_To_Data(data,&DVValue5);
-		data[HrtByteCnt++] = DVStatus5;
+		data[HrtByteCnt++] = Get_Density_Code();
+		data[HrtByteCnt++] = DEVICE_VARIABLE_NOT_CLASSIFICATION;
+		data[HrtByteCnt++] = Get_Density_Unit();
+		tmp1 = Get_Density_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_Density_Status();
 		
-		data[HrtByteCnt++] = DVCode6;
-		data[HrtByteCnt++] = DVClass6;
-		data[HrtByteCnt++] = DVUnit6;
-		Float_To_Data(data,&DVValue6);
-		data[HrtByteCnt++] = DVStatus6;
+		data[HrtByteCnt++] = Get_Contrast_Code();
+		data[HrtByteCnt++] = DEVICE_VARIABLE_NOT_CLASSIFICATION;
+		data[HrtByteCnt++] = Get_Contrast_Unit();
+		tmp1 = Get_Contrast_Value();
+		Float_To_Data(data,&tmp1);
+		data[HrtByteCnt++] = Get_Contrast_Status();
 
-		data[HrtByteCnt++] = DVCode7;
-		data[HrtByteCnt++] = DVClass7;
-		data[HrtByteCnt++] = DVUnit7;
-		Float_To_Data(data,&DVValue7);
-		data[HrtByteCnt++] = DVStatus7;
+		data[HrtByteCnt++] = DFC_NOT_USED;
+		data[HrtByteCnt++] = 0;
+		data[HrtByteCnt++] = 250;
+		data[HrtByteCnt++] = 0x7F;
+		data[HrtByteCnt++] = 0xA0;
+		data[HrtByteCnt++] = 0x00;
+		data[HrtByteCnt++] = 0x00;
+		data[HrtByteCnt++] = 0x30;
 
-		Float_To_Data(data,&TIMEStamp);*/
+		data[HrtByteCnt++] = _para.Date[0];
+		data[HrtByteCnt++] = _para.Date[1];
+		data[HrtByteCnt++] = _para.Date[2];
 	}
 }
 
@@ -1268,6 +1405,7 @@ void C11_RdUniqueIDWithTag(u8 *data){
 }
 
 /* message type : packed */
+//CMD12 - Read Message
 void C12_RdMessage(u8 *data) {
 	u8 i = 0;
 	u8 *dat;	
@@ -1281,6 +1419,8 @@ void C12_RdMessage(u8 *data) {
 	}
 }
 
+//CMD13 - Read Tag, Descriptor, Date
+//CMD18에서 쓸 수 있음.
 void C13_RdTagDescriptorDate(u8 *data){
 	u8 i = 0;
 	u8 *dat1, *dat2, *dat3;	
@@ -1302,6 +1442,9 @@ void C13_RdTagDescriptorDate(u8 *data){
 	}
 }
 
+//CMD14 - Read PV Transducer Infomation
+//CMD49에서 Serial Number 쓰기 가능
+//TODO 뭔지 확인해 볼 것.
 void C14_RdPVTransducerInfo(u8 *data){
 	u8 i = 0;
 	u8 *dat;	
@@ -1323,6 +1466,7 @@ void C14_RdPVTransducerInfo(u8 *data){
 	}
 }
 
+//CMD15 - Read Device Infomation
 void C15_RdDeviceInfo(u8 *data){
 	float tmp1,tmp2,tmp3;	
 	
@@ -1343,6 +1487,7 @@ void C15_RdDeviceInfo(u8 *data){
 	}
 }
 
+//CMD16 - Read FinalAssembly Number
 void C16_RdFinalAssemblyNum(u8 *data){
 	u8 *dat;
 	u8 i;	
@@ -1367,7 +1512,7 @@ void C17_WrMessage(u8 *data){
 			data[HrtByteCnt++] = *(dat+i);
 		}
 		Set_Message(dat);
-		Config_Change();
+		Config_Change(17);
 	}
 }
 
@@ -1384,7 +1529,7 @@ void C18_WrTagDescriptorDate(u8 *data){
 		Set_Tag(dat);
 		Set_Descriptor(dat+6);
 		Set_Date(dat+18);
-		Config_Change();
+		Config_Change(18);
 	}
 }
 
@@ -1399,10 +1544,11 @@ void C19_WrFinalAssemblyNum(u8 *data){
 			data[HrtByteCnt++] = *(dat+i);
 		}
 		Set_Final_Assembly_Num(dat);
-		Config_Change();
+		Config_Change(19);
 	}
 }
 
+//CMD20 - Read Long Tag
 void C20_RdLongTag(u8 *data){
 	u8 i = 0;
 	u8 *dat1;
@@ -1434,7 +1580,7 @@ void C22_WrLongTag(u8 *data){
 			data[HrtByteCnt++] = *(dat+i);
 		}
 		Set_LongTag(dat);
-		Config_Change();
+		Config_Change(22);
 	}
 }
 
@@ -1466,24 +1612,24 @@ void C33_RdDeviceVariable(u8 *data){
 					tmp = Get_Pv();
 					Float_To_Data(data,&tmp);
 					break;
-				case SV_CODE:
-					data[HrtByteCnt++] = *(dat+i);
-					data[HrtByteCnt++] = Get_Sv_Unit();
-					tmp = Get_Sv();
-					Float_To_Data(data,&tmp);
-					break;
-				case TV_CODE:
-					data[HrtByteCnt++] = *(dat+i);
-					data[HrtByteCnt++] = Get_Tv_Unit();
-					tmp = Get_Tv();
-					Float_To_Data(data,&tmp);
-					break;
-				case QV_CODE:
-					data[HrtByteCnt++] = *(dat+i);
-					data[HrtByteCnt++] = Get_Qv_Unit();
-					tmp = Get_Qv();
-					Float_To_Data(data,&tmp);
-					break;
+//				case SV_CODE:
+//					data[HrtByteCnt++] = *(dat+i);
+//					data[HrtByteCnt++] = Get_Sv_Unit();
+//					tmp = Get_Sv();
+//					Float_To_Data(data,&tmp);
+//					break;
+//				case TV_CODE:
+//					data[HrtByteCnt++] = *(dat+i);
+//					data[HrtByteCnt++] = Get_Tv_Unit();
+//					tmp = Get_Tv();
+//					Float_To_Data(data,&tmp);
+//					break;
+//				case QV_CODE:
+//					data[HrtByteCnt++] = *(dat+i);
+///					data[HrtByteCnt++] = Get_Qv_Unit();
+//					tmp = Get_Qv();
+//					Float_To_Data(data,&tmp);
+//					break;
 				default:
 					data[HrtByteCnt++] = *(dat+i);
 					data[HrtByteCnt++] = 250;   //not used
@@ -1508,7 +1654,7 @@ void C34_WrPVDamping(u8 *data){
 		tmp = Data_To_Float(dat);
 		Float_To_Data(data,&tmp);
 		Set_Pv_Damping_Time(tmp);
-		Config_Change();
+		Config_Change(34);
 	}
 }
 
@@ -1527,7 +1673,7 @@ void C35_WrPVRange(u8 *data){
 		Set_Ul_Range_Unit(*dat);
 		Set_Pv_Upper_Range(tmp1);
 		Set_Pv_Lower_Range(tmp2);
-		Config_Change();
+		Config_Change(35);
 	}
 }
 
@@ -1538,7 +1684,7 @@ void C36_SetPVUpperRange(u8 *data){
 	if(!HrtResposeCode){
 		tmp = Get_Pv();
 		Set_Pv_Upper_Range(tmp);
-		Config_Change();
+		Config_Change(36);
 	}	
 }
 
@@ -1549,7 +1695,7 @@ void C37_SetPVLowerRange(u8 *data){
 	if(!HrtResposeCode){
 		tmp = Get_Pv();
 		Set_Pv_Lower_Range(tmp);
-		Config_Change();
+		Config_Change(37);
 	}
 }
 
@@ -1577,26 +1723,23 @@ void C40_EnterOrExitFixedCurrent(u8 *data){
 		dat = Get_Rx_Data_Pointer();
 		tmp = Data_To_Float(dat);
 		Set_Fixed_Current(tmp);
+		Config_Change(40);
 	}
 }
 
+
+//TODO SelfTest implement
 void C41_PerformSelfTest(u8 *data){
-	//PerformSelfTest func;
-	
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
-		//func = (PerformSelfTest)Get_Perform_Self_Test_Ptr();
-		//func();
 	}
 }
 
+//TODO Device Reset implement
 void C42_PerformDeviceReset(u8 *data){
-	//PerformDeviceReset func;
-	
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
-		//func = (PerformDeviceReset)Get_Perform_Device_Reset_Ptr();
-		//func();
+		NVIC_SystemReset();
 	}
 }
 
@@ -1607,6 +1750,7 @@ void C43_PVZero(u8 *data){
 	if(!HrtResposeCode){
 		tmp = Get_Pv();
 		Set_Pv_Zero(tmp);
+		Config_Change(43);
 	}
 }
 
@@ -1618,10 +1762,11 @@ void C44_WrPVUnit(u8 *data){
 		dat = Get_Rx_Data_Pointer();
 		data[HrtByteCnt++] = *dat;
 		Set_Pv_Unit(*dat);
-		Config_Change();
+		Config_Change(44);
 	}
 }
 
+//TODO Definition
 void C45_TrimLoopCurrentZero(u8 *data){
 	u8 *dat;
 	float tmp;
@@ -1645,6 +1790,8 @@ void C45_TrimLoopCurrentZero(u8 *data){
 	}
 }
 
+
+//TODO Definition
 void C46_TrimLoopCurrentGain(u8 *data){
 	u8 *dat;
 	float tmp;
@@ -1676,10 +1823,11 @@ void C47_WrPVTransferFunction(u8 *data){
 		dat = Get_Rx_Data_Pointer();
 		data[HrtByteCnt++] = *dat;
 		Set_Transfer_Func((enum transfer_func)(*dat));
-		Config_Change();
+		Config_Change(47);
 	}
 }
 
+//TODO Definition
 void C48_RdAdditionalDeviceStatus(u8 *data){
 	u8 i;
 	u8 *dat;
@@ -1697,6 +1845,10 @@ void C48_RdAdditionalDeviceStatus(u8 *data){
 		data[HrtByteCnt++] = Get_Std_Status_2();
 		data[HrtByteCnt++] = Get_Std_Status_3();
 		data[HrtByteCnt++] = Get_Analog_Channel_Fixed();
+		dat = Get_Device_Specific_Status();
+		for(i = 0;i < 6;i++){
+				data[HrtByteCnt++] = *(dat+i);
+		}
 	}
 }
 
@@ -1710,7 +1862,7 @@ void C49_WrPVTransducerSerialNum(u8 *data){
 		data[HrtByteCnt++] = *(dat+1);
 		data[HrtByteCnt++] = *(dat+2);
 		Set_Transducer_Serial_Num(dat);
-		Config_Change();
+		Config_Change(49);
 	}
 }
 
@@ -1718,9 +1870,9 @@ void C50_RdDVAssignments(u8 *data){
 	Set_Response_Code(data);
 	if(!HrtResposeCode){
 		data[HrtByteCnt++] = Get_Pv_Code();
-		data[HrtByteCnt++] = Get_Sv_Code();
-		data[HrtByteCnt++] = Get_Tv_Code();
-		data[HrtByteCnt++] = Get_Qv_Code();
+		data[HrtByteCnt++] = 250;
+		data[HrtByteCnt++] = 250;
+		data[HrtByteCnt++] = 250;
 	}
 }
 
@@ -1738,7 +1890,7 @@ void C51_WrDVAssignments(u8 *data){
 		Set_Sv_Code(*(dat+1));
 		Set_Tv_Code(*(dat+2));
 		Set_Qv_Code(*(dat+3));
-		Config_Change();
+		Config_Change(51);
 	}
 }
 
@@ -1750,7 +1902,7 @@ void C59_WrNumOfResposePreambles(u8 *data){
 		dat = Get_Rx_Data_Pointer();
 		data[HrtByteCnt++] = *dat;
 		Set_Response_Preamble_Num(*dat);
-		Config_Change();
+		Config_Change(59);
 	}
 }
 
@@ -1762,7 +1914,7 @@ void C108_WrBurstModeCmdNum(u8 *data){ //command 1,2,3,9 should be supported by 
 		dat = Get_Rx_Data_Pointer();
 		data[HrtByteCnt++] = *dat;
 		Set_Burst_Mode_Cmd_Num(*dat);
-		Config_Change();
+		Config_Change(108);
 	}
 }
 
@@ -1803,8 +1955,7 @@ void UART_Int_Handler(void){
    	}
 }
 
-void GP_Tmr0_Int_Handler(void)
-{
+void GP_Tmr0_Int_Handler(void){
 	u8 i;
 	
    // Timer0 Interrupt : 1msec

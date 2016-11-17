@@ -37,11 +37,11 @@ typedef uint32_t		u32;
 #define SLAVE_TIMER 1
 #define BT_TIMER    2
 
-#define HART_STO       257 /* unit:ms, sto = 256.7ms */
+#define HART_STO       260 /* unit:ms, sto = 256.7ms */
 #define HART_PRI_RT1   305 /* unit:ms,  = 302.5ms */
-#define HART_SEC_RT1   376 /* unit:ms,  = 375.8ms */
-#define HART_RT2       74  /* unit:ms,  = 73.3ms */
-#define HART_GAPT      10  /* unit:ms,  = 9.2ms */
+#define HART_SEC_RT1   380 /* unit:ms,  = 375.8ms */
+#define HART_RT2       75  /* unit:ms,  = 73.3ms */
+#define HART_GAPT      20  /* unit:ms,  = 9.2ms */
 
 #define LONG_ADDR_SIZE  5
 #define SHORT_ADDR_SIZE 1
@@ -91,8 +91,8 @@ enum transfer_func{
 };
 
 enum protect{
-	YES_PROTECT,
 	NO_PROTECT,
+	YES_PROTECT,
 };
 
 enum analog_channel{
@@ -100,20 +100,21 @@ enum analog_channel{
 };
 
 enum {
+	DEVICE_VARIABLE_NOT_CLASSIFICATION = 0,
 	PERCENT_UNIT = 57, // %
 	CURRENT_UNIT = 39, // mA
-	PV_CLASS,  //table 21
-	SV_CLASS,
-	TV_CLASS,
-	QV_CLASS,
+	TORQUE =110 ,  //table 21 TORQUE(110)
+	//SV_CLASS,
+	//TV_CLASS,
+	//QV_CLASS,
 	/* DV code */
 	BATTERY_LIFE = 243,  //table 34
 	PERCENT_RANGE = 244,
 	LOOP_CURRENT,
 	PV_CODE,
-	SV_CODE,
-	TV_CODE,
-	QV_CODE,
+	//SV_CODE,
+	//TV_CODE,
+	//QV_CODE,
 };
 
 enum{
@@ -121,10 +122,23 @@ enum{
     PRIMARY_MASTER,
 };
 
+enum{
+	UNDEFINED_FLAG_ASSINMENT = 0x00,
+	MULTI_SENSOR_FIELD_DEVICE = 0x01,
+	EEPROM_CONTROL = 0x02,
+	PROTOCOL_BRIDGE_DEVICE = 0x04,
+	IEEE802_15_4_DSSS = 0x08,
+	C8PSK_CAPABLE_FIELD_DEVICE = 0x40,
+	C8PSK_IN_MULTI_DROP_ONLY = 0x80,
+};
+
 enum extended_device_status{
+	UNDEFINED_EXPANDED_DEVICE_STATUS = 0x00,
 	MAINTANANCE_REQUIRED         = 0x01,
 	DEVICE_VARIABLE_ALERT        = 0x02,
 	CRITICAL_POWER_FAILURE       = 0x04,
+	FAILIRE_DEVICE_STATUS		= 0x10,
+	FUNCTION_CHECK				= 0x20,	
 };
 
 enum standardized_status_0{
@@ -135,6 +149,69 @@ enum standardized_status_0{
 	VOTAGE_OUT_OF_RANGE           = 0x10,
 	ENVIRONMENTAL_OUT_OF_RANGE    = 0x20,
 	ELECTRONIC_DEFECT             = 0x40,
+};
+
+enum device_profile_codes{
+	PROCESS_AUTOMATION_DEVICE = 1,
+	DISCRETE_DEVICE = 2,
+	HYBRID_DEVICE = 3,
+	IO_SYSTEM = 4,
+	DISCRETE_ADAPTER = 14,
+	WIRELESS_PROCESS_AUTOMATION_DEVICE = 129,
+	WIRELESS_DISCRETE_DEVICE = 130,
+	WIRELESS_HYBRIDE_DEVICE = 131,
+	WIRELESS_GATEWAY = 132,
+	WIRELESS_ACCESS_POINT = 140,
+	WIRELESS_PROCESS_ADAPTER = 141,
+	WIRELESS_DISCRETE_ADAPTER = 142,
+	WIRELESS_ENABLE_HANDHELD = 144,
+};
+
+enum engineering_unit_codes{
+	DEGREES_CELSIUS = 32,
+	DEGREES_FAHRENHEIT = 33,
+	DEGREES_MILLVOLT = 36,
+	DEGREES_OHM = 37,
+	DEGREES_MILLIAMPERE = 39,
+	DEGREES_INCH = 47,
+	DEGREES_MILLIMETER = 49,
+	DEGREES_MINUTE = 50,
+	DEGREES_SECOND = 51,
+	DEGREES_HOUR = 52,
+	DEGREES_DAY = 53,
+	DEGREES_PERCENT = 57,
+	DEGREES_VOLT = 58,
+	DEGREES_NOTUSED = 250,
+	DEGREES_NONE = 251,
+	DEGREES_UNKNOWN = 252,
+	DEGREES_SPECIAL = 253,
+};
+
+enum device_variable_status{
+	PDQ_GOOD = 0xC0,
+	PDQ_POOR_ACCURACY = 0x40,
+	PDQ_MANUAL_FIXED = 0x80,
+	PDQ_BAD = 0x00,
+	LS_CONSTANT = 0x30,
+	LS_LOW_LIMITED = 0x10,
+	LS_HIGH_LIMITED = 0x20,
+	LS_NOT_LIMITED = 0x00,
+	MORE_DVSA = 0x08,
+};
+
+enum device_variable_family_codes{
+	DFC_TEMPERATURE = 4,
+	DFC_PRESSURE,
+	DFC_VALVE_ACTUATOR,
+	DFC_PID,
+	DFC_PH,
+	DFC_CONDUCTIVITIY,
+	DFC_TOTALIZER,
+	DFC_LEVEL,
+	DFC_VORTEX_FLOW,
+	DFC_MAG_FLOW,
+	DFC_CORIOLIS_FLOW,
+	DFC_NOT_USED= 250,
 };
 
 /* STX : a master to slave message */
@@ -242,6 +319,8 @@ void Set_Tv_Code(u8 tv_code);
 u8 Get_Tv_Code(void);
 void Set_Qv_Code(u8 qv_code);
 u8 Get_Qv_Code(void);
+void Set_Pv_Status(u8 pv_status);
+u8 Get_Pv_Status(void);
 void  Set_Loop_Current(float current);
 float Get_Loop_Current(void);
 void  Set_Percent_Of_Range(float percent_of_range);
@@ -309,6 +388,8 @@ void Set_Final_Assembly_Num(u8 *fan);
 u8 *Get_Final_Assembly_Num(void);
 void Set_Config_Change_Flag(u8 cfg_change_flag);
 u8 Get_Config_Change_Flag(void);
+void Set_Config_Change_Counter(u16 cfg_change_flag);
+u16 Get_Config_Change_Counter(void);
 void Set_Fixed_Current(float fixed_current);
 float Get_Fixed_Current(void);
 void Set_Act_Zero_Current(float act_zero_curr);
@@ -320,6 +401,54 @@ u8 *Get_Device_Specific_Status(void);
 void Set_Device_Operating_Mode(u8 mode);
 u8 Get_Device_Operating_Mode(void) ;
 u8 Get_Host_Type(void);
+void Set_CORR_Value(float correct_value) ;
+float Get_CORR_Value(void);
+void Set_CORR_Unit(u8 correct_unit);
+u8 Get_CORR_Unit(void);
+void Set_CORR_Code(u8 correct_code);
+u8 Get_CORR_Code(void);
+void Set_CORR_Status(u8 correct_status) ;
+u8 Get_CORR_Status(void) ;
+void Set_UserSet_20mA_Value(float userset_20ma_value);
+float Get_UserSet_20mA_Value(void) ;
+void Set_UserSet_20mA_Unit(u8 userset_20ma_unit) ;
+u8 Get_UserSet_20mA_Unit(void) ;
+void Set_UserSet_20mA_Code(u8 userset_20ma_code) ;
+u8 Get_UserSet_20mA_Code(void) ;
+void Set_UserSet_20mA_Status(u8 userset_20ma_status);
+u8 Get_UserSet_20mA_Status(void) ;
+void Set_UserSet_4mA_Value(float userset_4ma_value) ;
+float Get_UserSet_4mA_Value(void);
+void Set_UserSet_4mA_Unit(u8 userset_4ma_unit);
+u8 Get_UserSet_4mA_Unit(void);
+void Set_UserSet_4mA_Code(u8 userset_4ma_code);
+u8 Get_UserSet_4mA_Code(void) ;
+void Set_UserSet_4mA_Status(u8 userset_4ma_status);
+u8 Get_UserSet_4mA_Status(void) ;
+void Set_CurrentDir_Value(float currentdir_value) ;
+float Get_CurrentDir_Value(void) ;
+void Set_CurrentDir_Unit(u8 currentdir_unit);
+u8 Get_CurrentDir_Unit(void);
+void Set_CurrentDir_Code(u8 currentdir_code);
+u8 Get_CurrentDir_Code(void);
+void Set_CurrentDir_Status(u8 currentdir_status);
+u8 Get_CurrentDir_Status(void);
+void Set_Density_Value(float density_value);
+float Get_Density_Value(void);
+void Set_Density_Unit(u8 density_unit);
+u8 Get_Density_Unit(void) ;
+void Set_Density_Code(u8 density_code) ;
+u8 Get_Density_Code(void);
+void Set_Density_Status(u8 density_status);
+u8 Get_Density_Status(void) ;
+void Set_Contrast_Value(float contrast_value) ;
+float Get_Contrast_Value(void) ;
+void Set_Contrast_Unit(u8 contrast_unit) ;
+u8 Get_Contrast_Unit(void);
+void Set_Contrast_Code(u8 contrast_code);
+u8 Get_Contrast_Code(void);
+void Set_Contrast_Status(u8 contrast_status);
+u8 Get_Contrast_Status(void);
 
 void Init_Param(void);
 void Soft_Timer_Init(void);
@@ -353,8 +482,8 @@ static void Soft_Timer_Dec(Soft_Timer *tmr);
 void Set_Delay_Time(u8 id,u16 cnt);
 u8 Is_Timeout_Id(u8 id);
 
-void set_ID(u8 *data);
-static void Config_Change(void);
+void Set_ID(u8 *data);
+static void Config_Change(u16 CmdCode);
 static float Data_To_Float(u8 *tmp);
 static void Float_To_Data(u8 *data,float *tmp);
 u8 *Get_Rx_Data_Pointer(void);

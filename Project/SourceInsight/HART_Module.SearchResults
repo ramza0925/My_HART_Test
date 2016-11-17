@@ -1,8 +1,6 @@
----- DEBUG Matches (7 in 2 files) ----
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG        
-HART.c (d:\001_works\001_working\20161021_hart_module\inc):#ifdef DEBUG			
-HART.h (d:\001_works\001_working\20161021_hart_module\inc):#define DEBUG
+---- Set_Pv_Lower_Range Matches (5 in 2 files) ----
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):void Set_Pv_Lower_Range(float lower_range) { _para.PVlowerRange = lower_range; }
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):	Set_Pv_Lower_Range(30.0f);
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):		Set_Pv_Lower_Range(tmp2);
+HART.c (d:\001_works\001_working\20161021_hart_module\inc):		Set_Pv_Lower_Range(tmp);
+HART.h (d:\001_works\001_working\20161021_hart_module\inc):void Set_Pv_Lower_Range(float lower_range);
